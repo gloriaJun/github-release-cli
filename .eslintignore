@@ -1,0 +1,19 @@
+node_modules
+
+## output
+build
+dist
+coverage
+# __snapshots__
+
+## config
+*.config.js
+
+# fixtures
+# shared-fixtures
+
+# react-app
+**/src/reportWebVitals.ts
+**/src/report-web-vitals.ts
+
+# packages/eslint-plugin-tslint/tests

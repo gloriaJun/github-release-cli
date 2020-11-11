@@ -1,0 +1,38 @@
+{
+  "name": "github-release-cli",
+  "version": "1.0.0",
+  "description": "github release management command-line tool",
+  "repository": "https://github.com/gloriaJun/github-release-cli.git",
+  "author": "gloriaJun <pureainu@gmail.com>",
+  "license": "MIT",
+  "bin": {
+    "grm": "./dist/index.js"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@types/commander": "^2.12.2",
+    "@types/ora": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
+    "eslint": "^7.13.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "lint-staged": "^10.5.1",
+    "prettier": "^2.1.2",
+    "typescript": "^4.0.5"
+  },
+  "dependencies": {
+    "commander": "^6.2.0",
+    "ora": "^5.1.0"
+  }
+}
