@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
 import commander from 'commander';
-// import inquirer from 'inquirer';
-import dotenv from 'dotenv';
 
 import pkg from '../package.json';
+import { setConfiguration } from './config';
 // import { getBranchList } from './action';
 
 /*******************************************/
@@ -23,34 +22,29 @@ commander
   .command('release <branch> [configFile]')
   .description('release the release branch')
   // function to execute when command is uses
-  .action(function (branch, configFile) {
-    console.log('### release branch', branch, configFile);
+  .action(async (branch, configFile) => {
+    console.log('### release branch - ', branch, configFile);
+
+    await setConfiguration(configFile);
     // getBranchList();
-
-    const result = dotenv.config({ path: './.env' });
-    if (result.error) {
-      console.error('can not read file');
-    }
-
-    console.log('parse', result.parsed);
   });
 
-commander
-  .command('hotfix')
-  .description('release the hotfix branch')
+// commander
+//   .command('hotfix')
+//   .description('release the hotfix branch')
 
-  // function to execute when command is uses
-  .action(function (branch) {
-    console.log('### hotfix', branch);
-    // getBranchList();
+//   // function to execute when command is uses
+//   .action(function (branch) {
+//     console.log('### hotfix', branch);
+//     // getBranchList();
 
-    const result = dotenv.config({ path: './.env' });
-    if (result.error) {
-      console.error('can not read file');
-    }
+//     const result = dotenv.config({ path: './.env' });
+//     if (result.error) {
+//       console.error('can not read file');
+//     }
 
-    console.log('parse', result.parsed);
-  });
+//     console.log('parse', result.parsed);
+//   });
 
 /*******************************************/
 /* main
