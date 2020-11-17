@@ -4,13 +4,7 @@ import commander from 'commander';
 
 import pkg from '../package.json';
 import { setConfiguration } from './config';
-// import { getBranchList } from './action';
-
-/*******************************************/
-// const apiUrl = 'https://git.linecorp.com/api/v3/';
-// const owner = 'gloriaJun';
-// const repo = 'github-release-cli.git';
-/*******************************************/
+import { askConfigConfirm } from './inquirer';
 
 commander.version(pkg.version, '-v, --version').description(pkg.description);
 
@@ -19,14 +13,19 @@ commander.version(pkg.version, '-v, --version').description(pkg.description);
 /*******************************************/
 
 commander
-  .command('release <branch> [configFile]')
+  .command('release [configFile]')
   .description('release the release branch')
   // function to execute when command is uses
-  .action(async (branch, configFile) => {
-    console.log('### release branch - ', branch, configFile);
+  .action(async (configFile = '.env') => {
+    console.log('### release branch - ', configFile);
 
-    await setConfiguration(configFile);
-    // getBranchList();
+    const config = await setConfiguration(configFile);
+    const isContinue = await askConfigConfirm(config);
+
+    if (isContinue) {
+      // do something
+      console.log('do git action');
+    }
   });
 
 // commander

@@ -1,44 +1,45 @@
-import inquirer from 'inquirer';
+import { inquirerRequiredQuestion } from './shared';
 
-import { IGitAuthConfig } from '../interface';
-import { isNotEmpty } from '../utility';
-
-const getBaseApiUrl = async () => {
-  const { baseUrl } = (await inquirer.prompt([
+export const getBaseApiUrl = async () => {
+  return await inquirerRequiredQuestion(
     {
       type: 'input',
-      name: 'baseUrl',
       message: 'API endpoint',
       default: 'https://api.github.com',
     },
-  ])) as inquirer.Answers;
-
-  return baseUrl as string;
+    'baseUrl',
+  );
 };
 
-const getToken = async () => {
-  let token;
-
-  do {
-    const answer = (await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'token',
-        message: 'OAuth2 token',
-        default: null,
-      },
-    ])) as inquirer.Answers;
-    token = answer.token as string;
-  } while (!token);
-
-  return token;
+export const getToken = async () => {
+  return await inquirerRequiredQuestion(
+    {
+      type: 'input',
+      message: 'OAuth2 token',
+      default: null,
+    },
+    'token',
+  );
 };
 
-export const inquirerAuthConfig = async (config: IGitAuthConfig) => {
-  return {
-    baseUrl: isNotEmpty(config.baseUrl)
-      ? config.baseUrl
-      : await getBaseApiUrl(),
-    token: isNotEmpty(config.token) ? config.token : await getToken(),
-  };
+export const getRepoOwner = async () => {
+  return await inquirerRequiredQuestion(
+    {
+      type: 'input',
+      message: 'Repo Owner',
+      default: null,
+    },
+    'owner',
+  );
+};
+
+export const getRepoName = async () => {
+  return await inquirerRequiredQuestion(
+    {
+      type: 'input',
+      message: 'Repo Name',
+      default: null,
+    },
+    'repo',
+  );
 };
