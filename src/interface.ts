@@ -13,6 +13,13 @@ export interface IBranchInfo {
   hotfix: string;
 }
 
+export interface IGitFlowBranchInfo {
+  master: string;
+  develop: string;
+  release: string;
+  hotfix: string;
+}
+
 export interface IGitAuthConfig {
   baseUrl: string;
   token: string;
@@ -20,8 +27,12 @@ export interface IGitAuthConfig {
   repo: string;
 }
 
+export interface IPullRequestConfig {
+  relBranch: string;
+  targetPrBranchInfo: IGeneralObject<IBranchPrInfo>;
+}
+
 export interface IReleaseConfig {
   relBranch: string;
   tagName: string;
-  targetPrBranchInfo: IGeneralObject<IBranchPrInfo>;
 }

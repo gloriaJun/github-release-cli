@@ -1,3 +1,3 @@
 export * from './auth';
-export * from './release';
+export * from './pr';
 export * from './confirm';

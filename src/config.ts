@@ -1,17 +1,35 @@
 import dotenv from 'dotenv';
 
-import {
-  askReleaseProcess,
-  getBaseApiUrl,
-  getRepoName,
-  getRepoOwner,
-  getToken,
-  setBranchPrefix,
-} from './inquirer';
+import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './inquirer';
 import { setGitApiService } from './action';
-import { parseEnvConfigByKey, parseEnvConfigString } from './utility';
+import {
+  isNotEmpty,
+  parseEnvConfigByKey,
+  parseEnvConfigString,
+} from './utility';
+import { IGitFlowBranchInfo } from './interface';
 
-export const setConfiguration = async (path: string) => {
+const defaultBranchInfo: IGitFlowBranchInfo = {
+  master: 'main',
+  develop: 'develop',
+  release: 'release/',
+  hotfix: 'hotfix/',
+};
+
+const setBranchPrefix = (info: IGitFlowBranchInfo) => {
+  const keys = Object.keys(info) as Array<keyof IGitFlowBranchInfo>;
+
+  return keys.reduce((result, key: keyof IGitFlowBranchInfo) => {
+    if (isNotEmpty(info[key])) {
+      result[key] = info[key];
+    }
+    return result;
+  }, defaultBranchInfo);
+};
+
+export const setConfiguration = async (
+  path: string,
+): Promise<IGitFlowBranchInfo> => {
   dotenv.config({ path });
 
   const gitConfig = {
@@ -26,12 +44,13 @@ export const setConfiguration = async (path: string) => {
   console.log('------------------');
 
   setGitApiService(gitConfig);
-  setBranchPrefix({
+
+  const branchInfo = setBranchPrefix({
     master: parseEnvConfigString('MASTER'),
     develop: parseEnvConfigString('DEVELOP'),
     release: parseEnvConfigString('RELEASE'),
     hotfix: parseEnvConfigString('HOTFIX'),
   });
 
-  return await askReleaseProcess();
+  return branchInfo;
 };

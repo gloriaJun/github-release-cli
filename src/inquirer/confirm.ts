@@ -1,7 +1,7 @@
 import pad from 'pad';
 import colors from 'colors';
 
-import { IReleaseConfig } from '../interface';
+import { IPullRequestConfig } from '../interface';
 import { inquirerConfirmQuestion } from './shared';
 
 const paddingSize = 20;
@@ -10,21 +10,20 @@ const log = (name: string, value: string) => {
   console.log(pad(`${name}: `, paddingSize), colors.green(value));
 };
 
-export const askConfigConfirm = async ({
+export const askPullRequestConfigConfirm = async ({
   relBranch,
-  tagName,
   targetPrBranchInfo,
-}: IReleaseConfig) => {
+}: IPullRequestConfig) => {
   console.log('\n\n======================================');
-  console.log('Your Configuration');
+  console.log('Pull Request & Merge Configuration');
   console.log('======================================');
 
   log('Release Branch', relBranch);
-  log('Tag Name', tagName);
+  // log('Tag Name', tagName);
 
-  console.log('\nCreate Pull Request & Merge Option');
+  console.log('\nTarget Branch List');
   Object.keys(targetPrBranchInfo)
-    .filter((k) => !['relBranch', 'tagName'].includes(k))
+    // .filter((k) => !['relBranch', 'tagName'].includes(k))
     .map((k) => {
       const isYN = (v: boolean) => (v ? colors.green('Y') : colors.grey('N'));
       const obj = targetPrBranchInfo[k];

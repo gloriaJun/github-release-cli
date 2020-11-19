@@ -1,9 +1,7 @@
-import ora from 'ora';
 import { Octokit } from '@octokit/rest';
 
 import { IGitAuthConfig } from '../interface';
-
-const spinner = ora('Loading...');
+import loading from '../utility/loading';
 
 let octokit: Octokit;
 let owner: string;
@@ -25,18 +23,38 @@ export const setGitApiService = ({
 
 export const getBranchList = async () => {
   try {
-    spinner.start();
-
+    loading.start('get branch list');
     const { data } = await octokit.repos.listBranches({
       owner,
       repo,
     });
-
     return data.reduce((result: Array<string>, { name }) => {
       result.push(name);
       return result;
     }, []);
   } finally {
-    spinner.stop();
+    loading.stop();
+  }
+};
+
+export const createPullRequest = async (
+  title: string,
+  head: string,
+  base: string,
+) => {
+  try {
+    loading.start(`create pull reqquest to ${base} branch`);
+
+    const { data } = await octokit.pulls.create({
+      owner,
+      repo,
+      title,
+      head,
+      base,
+    });
+
+    return data;
+  } finally {
+    loading.stop();
   }
 };
