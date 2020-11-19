@@ -5,6 +5,7 @@ import commander from 'commander';
 import pkg from '../package.json';
 import { setConfiguration } from './config';
 import { askPullRequestProcess } from './inquirer';
+import { askReleaseProcess } from './inquirer/release';
 
 commander.version(pkg.version, '-v, --version').description(pkg.description);
 
@@ -20,15 +21,19 @@ commander
     console.log('### release branch - ', configFile);
 
     const gitFlowBranchInfo = await setConfiguration(configFile);
-    const prConfig = await askPullRequestProcess(gitFlowBranchInfo);
+    const prAnswer = await askPullRequestProcess(gitFlowBranchInfo);
 
-    if (!prConfig) {
+    if (!prAnswer) {
       return;
     }
 
-    // do something
+    const relAnswer = await askReleaseProcess(
+      gitFlowBranchInfo,
+      prAnswer.relBranch,
+    );
+
     console.log('do git action');
-    console.log('ask release process and do it');
+    console.log('ask release process and do it', relAnswer);
   });
 
 // commander

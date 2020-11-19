@@ -5,14 +5,6 @@ export interface IBranchPrInfo {
   isCreate: boolean;
   isMerge: boolean;
 }
-
-export interface IBranchInfo {
-  master: string;
-  develop: string;
-  release: string;
-  hotfix: string;
-}
-
 export interface IGitFlowBranchInfo {
   master: string;
   develop: string;

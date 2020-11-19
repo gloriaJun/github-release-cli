@@ -21,14 +21,15 @@ export const inquirerRequiredQuestion = async (
 };
 
 export const inquirerConfirmQuestion = async (
-  question: inquirer.Question,
-  key: string,
+  question: inquirer.Question = {},
 ) => {
+  const key = 'isContinue';
   const answer = await inquirer.prompt([
     {
       type: 'confirm',
       name: key,
-      ...question,
+      message: question.message || `Do you want to continue?`,
+      default: !!question.default,
     },
   ]);
 

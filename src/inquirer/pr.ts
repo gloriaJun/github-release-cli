@@ -53,23 +53,17 @@ const checkPullRequestToOtherBranch = async (
       const result = await promise.then();
       const defaultValue = [basicBranchInfo.master].includes(branch);
 
-      const isCreate = await inquirerConfirmQuestion(
-        {
-          message: `Create PR to '${branch}' branch`,
-          default: defaultValue,
-        },
-        'isCreate',
-      );
+      const isCreate = await inquirerConfirmQuestion({
+        message: `Create PR to '${branch}' branch`,
+        default: defaultValue,
+      });
 
       const isMerge =
         isCreate &&
-        (await inquirerConfirmQuestion(
-          {
-            message: `Merge PR to '${branch}' branch`,
-            default: defaultValue || isCreate,
-          },
-          'isMerge',
-        ));
+        (await inquirerConfirmQuestion({
+          message: `Merge PR to '${branch}' branch`,
+          default: defaultValue || isCreate,
+        }));
 
       result[branch] = {
         isCreate,

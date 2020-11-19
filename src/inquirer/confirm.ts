@@ -36,11 +36,5 @@ export const askPullRequestConfigConfirm = async ({
 
   console.log('\n');
 
-  return await inquirerConfirmQuestion(
-    {
-      message: `Do you want to continue?`,
-      default: true,
-    },
-    'isContinue',
-  );
+  return await inquirerConfirmQuestion({ default: true });
 };
