@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 
-import { IGitAuthConfig } from '../interface';
-import loading from '../utility/loading';
+import { IGitAuthConfig, IReleaseConfig } from './interface';
+import { loading } from './utility';
 
 let octokit: Octokit;
 let owner: string;
@@ -51,6 +51,43 @@ export const createPullRequest = async (
       title,
       head,
       base,
+    });
+
+    return data;
+  } finally {
+    loading.stop();
+  }
+};
+
+export const mergePullRequest = async (number: number, base: string) => {
+  try {
+    loading.start(`merge pull reqquest to ${base} branch`);
+
+    await octokit.pulls.merge({
+      owner,
+      repo,
+      pull_number: number,
+      merge_method: 'merge',
+    });
+  } finally {
+    loading.stop();
+  }
+};
+
+export const createRelease = async ({
+  tagName,
+  releaseName,
+  targetCommitish,
+}: IReleaseConfig) => {
+  try {
+    loading.start(`create a new release`);
+
+    const { data } = await octokit.repos.createRelease({
+      owner,
+      repo,
+      tag_name: tagName,
+      target_commitish: targetCommitish,
+      name: releaseName,
     });
 
     return data;

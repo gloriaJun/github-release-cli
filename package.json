@@ -6,7 +6,7 @@
   "author": "gloriaJun <pureainu@gmail.com>",
   "license": "MIT",
   "bin": {
-    "relbot": "./dist/index.js"
+    "grc": "./dist/index.js"
   },
   "files": [
     "dist/**/*"

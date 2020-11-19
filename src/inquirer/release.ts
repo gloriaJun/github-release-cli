@@ -1,6 +1,8 @@
 import inquirer from 'inquirer';
 
-import { IGitFlowBranchInfo } from '../interface';
+import { IGitFlowBranchInfo, IReleaseConfig } from '../interface';
+import { getToday } from '../utility';
+import { inquirerConfirmQuestion } from './shared';
 
 const getReleaesTagInfo = async (targetBranch: string, name: string) => {
   const askCondition = (answers: inquirer.Answers) => {
@@ -25,7 +27,7 @@ const getReleaesTagInfo = async (targetBranch: string, name: string) => {
       type: 'input',
       name: 'releaseName',
       message: 'Input release name',
-      default: name,
+      default: `${name} (${getToday()})`,
       when: askCondition,
     },
     {
@@ -41,10 +43,12 @@ const getReleaesTagInfo = async (targetBranch: string, name: string) => {
 export const askReleaseProcess = async (
   gitFlowBranchInfo: IGitFlowBranchInfo,
   relBranch: string,
-) => {
+): Promise<IReleaseConfig | undefined> => {
   const prefix = gitFlowBranchInfo.release;
-  return await getReleaesTagInfo(
-    gitFlowBranchInfo.master,
-    relBranch.replace(prefix, ''),
-  );
+  return (await inquirerConfirmQuestion({ default: true }))
+    ? ((await getReleaesTagInfo(
+        gitFlowBranchInfo.master,
+        relBranch.replace(prefix, ''),
+      )) as IReleaseConfig)
+    : undefined;
 };

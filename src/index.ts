@@ -3,9 +3,9 @@
 import commander from 'commander';
 
 import pkg from '../package.json';
+import { pullRequestAction, releaseAction } from './action';
 import { setConfiguration } from './config';
-import { askPullRequestProcess } from './inquirer';
-import { askReleaseProcess } from './inquirer/release';
+import { logging } from './utility';
 
 commander.version(pkg.version, '-v, --version').description(pkg.description);
 
@@ -19,21 +19,22 @@ commander
   // function to execute when command is uses
   .action(async (configFile = '.env') => {
     console.log('### release branch - ', configFile);
+    try {
+      const gitFlowBranchInfo = await setConfiguration(configFile);
 
-    const gitFlowBranchInfo = await setConfiguration(configFile);
-    const prAnswer = await askPullRequestProcess(gitFlowBranchInfo);
+      const relBranch = await pullRequestAction(gitFlowBranchInfo);
+      if (!relBranch) {
+        return;
+      }
 
-    if (!prAnswer) {
-      return;
+      const html_url = await releaseAction(gitFlowBranchInfo, relBranch);
+      if (html_url) {
+        logging.info(`Success release ${relBranch} 🎉🎉🎉`);
+        logging.info(`You can check the release note -> ${html_url}`);
+      }
+    } catch (e) {
+      console.log(e);
     }
-
-    const relAnswer = await askReleaseProcess(
-      gitFlowBranchInfo,
-      prAnswer.relBranch,
-    );
-
-    console.log('do git action');
-    console.log('ask release process and do it', relAnswer);
   });
 
 // commander

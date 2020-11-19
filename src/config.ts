@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 
 import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './inquirer';
-import { setGitApiService } from './action';
+import { setGitApiService } from './api';
 import {
   isNotEmpty,
   parseEnvConfigByKey,

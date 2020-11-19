@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
 
-import { getBranchList } from '../action';
+import { getBranchList } from '../api';
 import {
   IGitFlowBranchInfo,
   IBranchPrInfo,

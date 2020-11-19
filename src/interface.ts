@@ -23,8 +23,9 @@ export interface IPullRequestConfig {
   relBranch: string;
   targetPrBranchInfo: IGeneralObject<IBranchPrInfo>;
 }
-
 export interface IReleaseConfig {
-  relBranch: string;
+  isCreateRelease: boolean;
   tagName: string;
+  releaseName: string;
+  targetCommitish: string;
 }

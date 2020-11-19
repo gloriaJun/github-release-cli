@@ -3,6 +3,7 @@ import colors from 'colors';
 
 import { IPullRequestConfig } from '../interface';
 import { inquirerConfirmQuestion } from './shared';
+import { logging } from '../utility';
 
 const paddingSize = 20;
 
@@ -14,27 +15,24 @@ export const askPullRequestConfigConfirm = async ({
   relBranch,
   targetPrBranchInfo,
 }: IPullRequestConfig) => {
-  console.log('\n\n======================================');
-  console.log('Pull Request & Merge Configuration');
-  console.log('======================================');
+  logging.info('\n\n======================================');
+  logging.info('Pull Request & Merge Configuration');
+  logging.info('======================================');
 
   log('Release Branch', relBranch);
-  // log('Tag Name', tagName);
 
-  console.log('\nTarget Branch List');
-  Object.keys(targetPrBranchInfo)
-    // .filter((k) => !['relBranch', 'tagName'].includes(k))
-    .map((k) => {
-      const isYN = (v: boolean) => (v ? colors.green('Y') : colors.grey('N'));
-      const obj = targetPrBranchInfo[k];
+  logging.info('\nTarget Branch List');
+  Object.keys(targetPrBranchInfo).map((k) => {
+    const isYN = (v: boolean) => (v ? colors.green('Y') : colors.grey('N'));
+    const obj = targetPrBranchInfo[k];
 
-      console.log(
-        pad(`  - ${k}`, paddingSize),
-        `PR(${isYN(obj.isCreate)}), Merge(${isYN(obj.isMerge)})`,
-      );
-    });
+    logging.infoKeyValue(
+      `  - ${k}`,
+      `PR(${isYN(obj.isCreate)}), Merge(${isYN(obj.isMerge)})`,
+    );
+  });
 
-  console.log('\n');
+  logging.info('\n');
 
   return await inquirerConfirmQuestion({ default: true });
 };
