@@ -83,9 +83,9 @@ const checkPullRequestToOtherBranch = async (
 };
 
 export const askPullRequestProcess = async (
+  prefix: string,
   gitFlowBranchInfo: IGitFlowBranchInfo,
 ): Promise<IPullRequestConfig> => {
-  const prefix = gitFlowBranchInfo.release;
   const allList = await getBranchList();
 
   const releaseBranchList = allList.filter((v) => new RegExp(prefix).test(v));

@@ -4,9 +4,11 @@ import { IGitFlowBranchInfo } from './interface';
 import { logging } from './utility';
 
 export const pullRequestAction = async (
+  prefix: string,
   gitFlowBranchInfo: IGitFlowBranchInfo,
 ) => {
   const { relBranch, targetPrBranchInfo } = await askPullRequestProcess(
+    prefix,
     gitFlowBranchInfo,
   );
 
