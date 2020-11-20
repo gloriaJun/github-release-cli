@@ -1,6 +1,11 @@
 # github-release-cli
 
 
+## Installation
+
+```bash
+```
+
 ## Usage
 
 ### Add .env file
