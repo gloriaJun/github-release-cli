@@ -6,13 +6,11 @@ import { logging } from './utility';
 export const pullRequestAction = async (
   gitFlowBranchInfo: IGitFlowBranchInfo,
 ) => {
-  const { relBranch, targetPrBranchInfo = {} } =
-    (await askPullRequestProcess(gitFlowBranchInfo)) || {};
-  if (!relBranch) {
-    return;
-  }
+  const { relBranch, targetPrBranchInfo } = await askPullRequestProcess(
+    gitFlowBranchInfo,
+  );
 
-  Object.keys(targetPrBranchInfo).map(async (branch) => {
+  const promises = Object.keys(targetPrBranchInfo).map(async (branch) => {
     const { isCreate, isMerge } = targetPrBranchInfo[branch];
     if (!isCreate) {
       return;
@@ -34,19 +32,16 @@ export const pullRequestAction = async (
     }
   });
 
+  await Promise.all(promises);
+
   return relBranch;
 };
 
 export const releaseAction = async (
   gitFlowBranchInfo: IGitFlowBranchInfo,
-  releaseBranch: string,
+  relBranch: string,
 ) => {
-  const relAnswer = await askReleaseProcess(gitFlowBranchInfo, releaseBranch);
-  if (!relAnswer?.isCreateRelease) {
-    return;
-  }
-
-  const { html_url } = await createRelease(relAnswer);
-
+  const config = await askReleaseProcess(gitFlowBranchInfo, relBranch);
+  const { html_url } = await createRelease(config);
   return html_url;
 };

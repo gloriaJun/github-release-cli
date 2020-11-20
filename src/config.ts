@@ -39,10 +39,6 @@ export const setConfiguration = async (
     repo: await parseEnvConfigByKey('REPO_NAME', getRepoName),
   };
 
-  console.log('------------------');
-  console.log(gitConfig);
-  console.log('------------------');
-
   setGitApiService(gitConfig);
 
   const branchInfo = setBranchPrefix({

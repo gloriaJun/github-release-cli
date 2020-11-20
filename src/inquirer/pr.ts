@@ -11,6 +11,10 @@ import { askPullRequestConfigConfirm } from './confirm';
 import { inquirerConfirmQuestion } from './shared';
 
 const getReleaseBranch = async (list: Array<string>) => {
+  if (!list || list.length === 0) {
+    throw `[Error] The selectable branch list is empty ... ✋`;
+  }
+
   const { branch } = (await inquirer.prompt([
     {
       type: 'list',
@@ -80,7 +84,7 @@ const checkPullRequestToOtherBranch = async (
 
 export const askPullRequestProcess = async (
   gitFlowBranchInfo: IGitFlowBranchInfo,
-): Promise<IPullRequestConfig | undefined> => {
+): Promise<IPullRequestConfig> => {
   const prefix = gitFlowBranchInfo.release;
   const allList = await getBranchList();
 
@@ -89,7 +93,7 @@ export const askPullRequestProcess = async (
   const relBranch = await getReleaseBranch(releaseBranchList);
   const targetPrBranchInfo = await checkPullRequestToOtherBranch(
     gitFlowBranchInfo,
-    allList.filter((v) => v !== relBranch),
+    allList.filter((v) => !releaseBranchList.includes(v)),
   );
 
   const config = {
@@ -97,5 +101,10 @@ export const askPullRequestProcess = async (
     targetPrBranchInfo,
   };
 
-  return (await askPullRequestConfigConfirm(config)) ? config : undefined;
+  const answer = await askPullRequestConfigConfirm(config);
+  if (!answer) {
+    throw `Canceled Process ... ✋`;
+  }
+
+  return config;
 };

@@ -2,7 +2,6 @@ import inquirer from 'inquirer';
 
 import { IGitFlowBranchInfo, IReleaseConfig } from '../interface';
 import { getToday } from '../utility';
-import { inquirerConfirmQuestion } from './shared';
 
 const getReleaesTagInfo = async (targetBranch: string, name: string) => {
   const askCondition = (answers: inquirer.Answers) => {
@@ -43,12 +42,16 @@ const getReleaesTagInfo = async (targetBranch: string, name: string) => {
 export const askReleaseProcess = async (
   gitFlowBranchInfo: IGitFlowBranchInfo,
   relBranch: string,
-): Promise<IReleaseConfig | undefined> => {
+): Promise<IReleaseConfig> => {
   const prefix = gitFlowBranchInfo.release;
-  return (await inquirerConfirmQuestion({ default: true }))
-    ? ((await getReleaesTagInfo(
-        gitFlowBranchInfo.master,
-        relBranch.replace(prefix, ''),
-      )) as IReleaseConfig)
-    : undefined;
+
+  const answer = (await getReleaesTagInfo(
+    gitFlowBranchInfo.master,
+    relBranch.replace(prefix, ''),
+  )) as IReleaseConfig;
+  if (!answer.isCreateRelease) {
+    throw `Canceled Process ... ✋`;
+  }
+
+  return answer;
 };

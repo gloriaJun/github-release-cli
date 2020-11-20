@@ -18,20 +18,14 @@ commander
   .description('release the release branch')
   // function to execute when command is uses
   .action(async (configFile = '.env') => {
-    console.log('### release branch - ', configFile);
     try {
       const gitFlowBranchInfo = await setConfiguration(configFile);
 
       const relBranch = await pullRequestAction(gitFlowBranchInfo);
-      if (!relBranch) {
-        return;
-      }
-
       const html_url = await releaseAction(gitFlowBranchInfo, relBranch);
-      if (html_url) {
-        logging.info(`Success release ${relBranch} 🎉🎉🎉`);
-        logging.info(`You can check the release note -> ${html_url}`);
-      }
+
+      logging.info(`Success release ${relBranch} 🎉🎉🎉`);
+      logging.info(`You can check the release note -> ${html_url}`);
     } catch (e) {
       console.log(e);
     }

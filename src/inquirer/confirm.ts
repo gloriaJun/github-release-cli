@@ -15,7 +15,7 @@ export const askPullRequestConfigConfirm = async ({
   relBranch,
   targetPrBranchInfo,
 }: IPullRequestConfig) => {
-  logging.info('\n\n======================================');
+  logging.info('\n======================================');
   logging.info('Pull Request & Merge Configuration');
   logging.info('======================================');
 
@@ -31,8 +31,6 @@ export const askPullRequestConfigConfirm = async ({
       `PR(${isYN(obj.isCreate)}), Merge(${isYN(obj.isMerge)})`,
     );
   });
-
-  logging.info('\n');
 
   return await inquirerConfirmQuestion({ default: true });
 };
