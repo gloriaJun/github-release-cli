@@ -3,6 +3,13 @@
 
 ## Usage
 
+### Add .env file
+
+```bash
+```
+
+### Run Cli
+
 ```bash
 $ node ./dist/src/index.js release .env.local
 ? Choose the target branch release/1.0.0
@@ -23,3 +30,6 @@ Target Branch List
 
 ? Do you want to continue? (Y/n) 
 ```
+
+
+
