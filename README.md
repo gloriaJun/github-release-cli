@@ -6,6 +6,16 @@
 ### Add .env file
 
 ```bash
+BASE_URL=https://api.github.com
+TOKEN=
+REPO_OWNER=
+REPO_NAME=
+
+# branch info
+MASTER=
+DEVELOP=
+RELEASE=
+HOTFIX=
 ```
 
 ### Run Cli
