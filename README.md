@@ -4,6 +4,8 @@
 ## Installation
 
 ```bash
+yarn add 
+npm install
 ```
 
 ## Usage
