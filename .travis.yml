@@ -1,0 +1,32 @@
+language: node_js
+
+node_js:
+  - 'latest'
+
+cache:
+  directories:
+    - node_modules
+
+branches:
+  only:
+    - master
+
+install:
+  - npm install
+
+jobs:
+  include:
+    - stage: npm publish
+      before_script:
+        - npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+      script:
+        - npm run build
+        - npm publish
+
+notifications:
+  email: false
+  slack:
+    rooms:
+      - glriaroom:$SLACK_TOKEN#devops
+    on_success: change # default : always
+    on_failure: always # default : always
