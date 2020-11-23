@@ -9,5 +9,6 @@
     "esModuleInterop": true,
     "strict": true
   },
-  "include": [".eslintrc.js", "src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
