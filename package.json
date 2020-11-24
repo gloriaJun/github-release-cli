@@ -9,7 +9,8 @@
     "grmc": "./bin/grmc"
   },
   "files": [
-    "dist"
+    "lib",
+    "bin"
   ],
   "bugs": {
     "url": "https://github.com/gloriaJun/github-release-cli/issues"
