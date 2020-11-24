@@ -14,7 +14,7 @@
 
 ```bash
 yarn add -D grmc
-npm install -D grmc
+npm install --save-dev grmc
 ```
 
 ### Get Git Access Token
@@ -43,7 +43,7 @@ REPO_NAME=
 ### Run Cli
 
 ```bash
-$ node ./dist/src/index.js release .env.local
+$ grmc release .env.local
 ? Choose the target branch release/1.0.0
 ? Create PR to 'main' branch Yes
 ? Merge PR to 'main' branch Yes
