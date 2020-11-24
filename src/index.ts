@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import commander from 'commander';
 
 import pkg from '../package.json';

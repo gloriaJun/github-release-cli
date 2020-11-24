@@ -8,22 +8,18 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: './tsconfig.json',
-    warnOnUnsupportedTypeScriptVersion: false,
+    // warnOnUnsupportedTypeScriptVersion: false,
     sourceType: 'module',
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features,
   },
   plugins: ['@typescript-eslint'],
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:import/typescript',
-    'prettier',
-    'prettier/@typescript-eslint',
     'plugin:prettier/recommended',
+    'prettier/@typescript-eslint',
   ],
-  // ignorePatterns: ['node_modules', '*.config.js', 'build', 'dist'],
   rules: {
     // defined the common lint rules
     /**
@@ -46,6 +42,6 @@ module.exports = {
     // 'import/no-useless-path-segments': ['error', { noUselessIndex: true }],
     // 'import/prefer-default-export': 'off',
   },
-  overrides: [],
-  ignorePatterns: ['dist', 'node_modules'],
+  // overrides: [],
+  // ignorePatterns: ['dist', 'node_modules'],
 };
