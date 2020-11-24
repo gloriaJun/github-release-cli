@@ -1,4 +1,14 @@
-# github-release-cli
+# grmc
+
+> git release management command-line tool
+
+[![Build Status](https://travis-ci.com/gloriaJun/github-release-cli.svg?branch=main)](https://travis-ci.com/gloriaJun/github-release-cli)
+
+## Functions
+
+- Create Pull Request
+- Merge Pull Request
+- Create tag and release note
 
 ## Installation
 

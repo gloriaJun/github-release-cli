@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    // "rootDirs": ["src"],
-    // "baseUrl": "./src",
-    "outDir": "./dist",
-    "typeRoots": ["./node_modules/@types"],
+    // "baseUrl": "./",
+    // "rootDir": "src",
+    "outDir": "lib",
+    // "typeRoots": ["./node_modules/@types"],
     "target": "es5",
     "module": "commonjs",
     "allowJs": true,
@@ -12,6 +12,7 @@
     "strict": true,
     "moduleResolution": "node"
   },
-  "include": [".eslintrc.js", "src"],
-  "exclude": ["node_modules"]
+  // "files": ["package.json"],
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "prettier.config.js"]
 }
