@@ -13,13 +13,17 @@
 ## Installation
 
 ```bash
-yarn add
-npm install
+yarn add -D grmc
+npm install -D grmc
 ```
 
-## Usage
+### Get Git Access Token
 
-### Add .env file
+- https://github.com/settings/tokens
+
+> git token needs the read and write auth
+
+### Create the .env.local
 
 ```bash
 BASE_URL=https://api.github.com
@@ -28,11 +32,13 @@ REPO_OWNER=
 REPO_NAME=
 
 # branch info
-MASTER=
-DEVELOP=
-RELEASE=
-HOTFIX=
+#MASTER=main
+#DEVELOP=develop
+#RELEASE=release
+#HOTFIX=hotfix
 ```
+
+## Usage
 
 ### Run Cli
 
