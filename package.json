@@ -20,7 +20,7 @@
     "tag"
   ],
   "scripts": {
-    "prebuild": "rimraf dist",
+    "prebuild": "rimraf lib",
     "build": "tsc",
     "prestart": "yarn build",
     "start": "node ./dist/src/index.js",
