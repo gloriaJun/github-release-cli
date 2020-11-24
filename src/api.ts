@@ -13,7 +13,7 @@ export const setGitApiService = ({
   ...info
 }: IGitAuthConfig) => {
   octokit = new Octokit({
-    baseUrl,
+    baseUrl: baseUrl.replace(/\/$/, ''),
     auth: token,
   });
 
