@@ -8,7 +8,7 @@ import {
   IPullRequestConfig,
 } from '../interface';
 import { askPullRequestConfigConfirm } from './confirm';
-import { inquirerConfirmQuestion } from './shared';
+import { inquirerConfirmQuestion } from '../utility';
 
 const getReleaseBranch = async (list: Array<string>) => {
   if (!list || list.length === 0) {
@@ -102,11 +102,7 @@ export const askPullRequestProcess = async (
     relBranch,
     targetPrBranchInfo,
   };
-
-  const answer = await askPullRequestConfigConfirm(config);
-  if (!answer) {
-    throw `Canceled Process ... ✋`;
-  }
+  await askPullRequestConfigConfirm(config);
 
   return config;
 };

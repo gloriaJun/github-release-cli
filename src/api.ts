@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 
 import { IGitAuthConfig, IReleaseConfig } from './interface';
-import { loading } from './utility';
+import { loading, logging } from './utility';
 
 let octokit: Octokit;
 let owner: string;
@@ -72,6 +72,56 @@ export const mergePullRequest = async (number: number, base: string) => {
   } finally {
     loading.stop();
   }
+};
+
+export const getPullRequestList = async (base: string) => {
+  try {
+    loading.start(`generate release content`);
+
+    const { data } = await octokit.pulls.list({
+      owner,
+      repo,
+      base,
+      state: 'closed',
+    });
+
+    return data;
+  } finally {
+    loading.stop();
+    logging.success('generated the release note content');
+  }
+};
+
+export const getMainBranch = async (branch: string) => {
+  const { data } = await octokit.repos.getBranch({
+    owner,
+    repo,
+    branch,
+  });
+
+  return data.commit.sha;
+};
+
+export const getLatestTag = async () => {
+  const { data } = await octokit.repos.listTags({
+    owner,
+    repo,
+  });
+
+  return data[0]?.name;
+};
+
+export const createTag = async (tag: string, sha: string, message?: string) => {
+  const { data } = await octokit.git.createTag({
+    owner,
+    repo,
+    tag,
+    message: message || `create the tag ${tag}`,
+    object: sha,
+    type: 'commit',
+  });
+
+  return data;
 };
 
 export const createRelease = async ({

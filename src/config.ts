@@ -40,5 +40,6 @@ export const setConfiguration = async (path: string) => {
 
   return {
     basicBranches,
+    tagPrefix: parseEnvConfigString('TAG_PREFIX'),
   };
 };

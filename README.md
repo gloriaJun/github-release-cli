@@ -8,7 +8,9 @@
 
 - Create Pull Request
 - Merge Pull Request
-- Create tag and release note
+- Create tag
+- Create Release note
+  - write release note by pr list
 
 ## Installation
 
