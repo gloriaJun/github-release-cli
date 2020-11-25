@@ -25,8 +25,8 @@ export default {
     console.error(chalk.bgBlack.red('ERROR!!!'), ...args, EOL);
   },
   // about the processing step
-  stepTitle: (title: string, info: string) => {
-    log(`${EOL}🚀 ${title}`, chalk.bold(info));
+  stepTitle: (title: string, info?: string) => {
+    log(`${EOL}🚀 ${title}`, info ? chalk.bold(info) : '');
   },
   preview: ({ title, text }: IGeneralObject<string>) => {
     if (!isEmpty(text)) {

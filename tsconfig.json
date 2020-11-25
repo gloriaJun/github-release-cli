@@ -3,6 +3,9 @@
     // "baseUrl": "./",
     // "rootDir": "src",
     "outDir": "lib",
+    // "paths": {
+    //   "@/*": ["./src"]
+    // },
     // "typeRoots": ["./node_modules/@types"],
     "target": "es5",
     "module": "commonjs",
