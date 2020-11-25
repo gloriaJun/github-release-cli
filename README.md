@@ -8,13 +8,15 @@
 
 - Create Pull Request
 - Merge Pull Request
-- Create tag and release note
+- Create tag
+- Create Release note
+  - write release note by pr list
 
 ## Installation
 
 ```bash
 yarn add -D grmc
-npm install -D grmc
+npm install --save-dev grmc
 ```
 
 ### Get Git Access Token
@@ -43,7 +45,9 @@ REPO_NAME=
 ### Run Cli
 
 ```bash
-$ node ./dist/src/index.js release .env.local
+$ grmc rel major -c .env.local
+🚀 Start create pr & merge process
+? Do you want to create pr? (Y/n) Y
 ? Choose the target branch release/1.0.0
 ? Create PR to 'main' branch Yes
 ? Merge PR to 'main' branch Yes
@@ -61,4 +65,28 @@ Target Branch List
 
 
 ? Do you want to continue? (Y/n)
+```
+
+#### Run Only Create Release Note
+
+```bash
+$ grmc rel major -c .env.local
+🚀 Start create pr & merge process
+? Do you want to create pr? No
+
+🚀 Start create tag and release note from main
+⠧ Loading generate release content...
+
+✔ generated the release note content
+------------------------------------
+#### Changelogs
+* ci: add build script (#18) bae63f4
+
+#### Milestone
+https://github.com/gloriaJun/github-release-cli/milestone/1
+------------------------------------
+? Do you want to create the tag (v0.2.0 -> v0.3.0) ? Yes
+✔ Success release v0.3.0 from main 🎉🎉🎉
+🔗  https://github.com/gloriaJun/github-release-cli/releases/tag/v0.3.0
+✨  Done in 73.98s.
 ```

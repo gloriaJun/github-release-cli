@@ -1,52 +1,43 @@
 import commander from 'commander';
+import { exit } from 'process';
 
 import pkg from '../package.json';
-import { pullRequestAction, releaseAction } from './action';
 import { setConfiguration } from './config';
-import { IGitFlowBranchInfo } from './interface';
+import { pkgVersions } from './constants';
+import { runReleaseProcess } from './release';
 import { logging } from './utility';
 
-const main = async (target: keyof IGitFlowBranchInfo, configFile = '.env') => {
-  try {
-    const gitFlowBranchInfo = await setConfiguration(configFile);
+const defaultConfigPath = '.env';
+const pkgVersionList = Object.keys(pkgVersions);
 
-    const relBranch = await pullRequestAction(
-      gitFlowBranchInfo[target],
-      gitFlowBranchInfo,
-    );
-    const html_url = await releaseAction(gitFlowBranchInfo, relBranch);
+export function run() {
+  const checkCommonOptions = () => {
+    return setConfiguration(commander.config as string);
+  };
 
-    logging.info(`Success release ${relBranch} 🎉🎉🎉`);
-    logging.info(`You can check the release note -> ${html_url}`);
-  } catch (e) {
-    console.log(e);
-  }
-};
+  commander
+    .version(pkg.version, '-v, --version')
+    .arguments('<cmd> [options]')
+    .description(pkg.description)
+    .option('-c, --config <path>', `set config path`, defaultConfigPath);
 
-commander.version(pkg.version, '-v, --version').description(pkg.description);
+  commander
+    .command(`release <type>`)
+    .alias('rel')
+    .description('excute the release process', {
+      type: pkgVersionList.join(' | '),
+    })
+    .action(async (type) => {
+      if (!pkgVersionList.includes(type)) {
+        logging.error(`Invalid release type: `, type);
+        exit(1);
+      }
 
-/*******************************************/
-/* register command
-/*******************************************/
+      const config = await checkCommonOptions();
 
-commander
-  .command('release [configFile]')
-  .description('release the release branch')
-  // function to execute when command is uses
-  .action(async (configFile) => {
-    await main('release', configFile);
-  });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      await runReleaseProcess({ releaseType: type, ...config });
+    });
 
-commander
-  .command('hotfix [configFile]')
-  .description('release the hotfix branch')
-  // function to execute when command is uses
-  .action(async (configFile = '.env') => {
-    await main('hotfix', configFile);
-  });
-/*******************************************/
-/* main
-/*******************************************/
-
-// allow commander to parse `process.argv`
-commander.parse(process.argv);
+  commander.parse(process.argv);
+}

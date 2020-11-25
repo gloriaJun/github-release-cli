@@ -28,10 +28,21 @@ export const inquirerConfirmQuestion = async (
     {
       type: 'confirm',
       name: key,
-      message: question.message || `Do you want to continue?`,
+      message: question.message,
       default: !!question.default,
     },
   ]);
 
   return (answer[key] as boolean) || false;
+};
+
+export const inquirerContinueProcess = async (message?: string) => {
+  const isContinue = await inquirerConfirmQuestion({
+    message: message || `Do you want to continue?`,
+    default: true,
+  });
+
+  if (!isContinue) {
+    throw `Canceled Process ... ✋`;
+  }
 };
