@@ -7,7 +7,7 @@ export const pullRequestAction = async (
   prefixLsit: string[],
   gitFlowBranchInfo: IGitFlowBranchInfo,
 ) => {
-  logging.stepTitle(`Start create pr & mege process ...`);
+  logging.stepTitle(`Start create pr & merge process`);
 
   const answer = await inquirerConfirmQuestion({
     message: 'Do you want to create pr?',

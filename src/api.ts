@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 
 import { IGitAuthConfig, IReleaseConfig } from './interface';
-import { loading, logging } from './utility';
+import { loading } from './utility';
 
 let octokit: Octokit;
 let owner: string;
@@ -75,31 +75,35 @@ export const mergePullRequest = async (number: number, base: string) => {
 };
 
 export const getPullRequestList = async (base: string) => {
-  try {
-    loading.start(`generate release content`);
+  const { data } = await octokit.pulls.list({
+    owner,
+    repo,
+    base,
+    state: 'closed',
+  });
 
-    const { data } = await octokit.pulls.list({
-      owner,
-      repo,
-      base,
-      state: 'closed',
-    });
-
-    return data;
-  } finally {
-    loading.stop();
-    logging.success('generated the release note content');
-  }
+  return data;
 };
 
-export const getMainBranch = async (branch: string) => {
+export const getBranchInfo = async (branch: string) => {
   const { data } = await octokit.repos.getBranch({
     owner,
     repo,
     branch,
   });
 
-  return data.commit.sha;
+  return data;
+};
+
+export const getCommitList = async (base: string, head: string) => {
+  const { data } = await octokit.repos.compareCommits({
+    owner,
+    repo,
+    base,
+    head,
+  });
+
+  return data;
 };
 
 export const getLatestTag = async () => {
@@ -108,26 +112,14 @@ export const getLatestTag = async () => {
     repo,
   });
 
-  return data[0]?.name;
-};
-
-export const createTag = async (tag: string, sha: string, message?: string) => {
-  const { data } = await octokit.git.createTag({
-    owner,
-    repo,
-    tag,
-    message: message || `create the tag ${tag}`,
-    object: sha,
-    type: 'commit',
-  });
-
-  return data;
+  return data[0];
 };
 
 export const createRelease = async ({
   tagName,
   releaseName,
   targetCommitish,
+  body,
 }: IReleaseConfig) => {
   try {
     loading.start(`create a new release`);
@@ -138,6 +130,7 @@ export const createRelease = async ({
       tag_name: tagName,
       target_commitish: targetCommitish,
       name: releaseName,
+      body: body || '',
     });
 
     return data;
