@@ -1,6 +1,7 @@
 node_modules
 
 ## output
+lib
 build
 dist
 coverage
@@ -8,6 +9,7 @@ coverage
 
 ## config
 *.config.js
+.*rc.js
 
 # fixtures
 # shared-fixtures
