@@ -1,7 +1,7 @@
-import { api } from 'src/service';
-import { askPullRequestProcess } from 'src/inquirer';
-import { IGitFlowBranchInfo } from 'src/interface';
-import { inquirerConfirmQuestion, loading, logging } from 'src/utility';
+import { api } from '../service';
+import { askPullRequestProcess } from '../inquirer';
+import { IGitFlowBranchInfo } from '../interface';
+import { inquirerConfirmQuestion, loading, logging } from '../utility';
 
 export const pullRequestAction = async (
   prefixLsit: string[],

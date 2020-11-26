@@ -1,13 +1,13 @@
 import { EOL } from 'os';
 import semver from 'semver';
 
-import { api } from 'src/service';
+import { api } from '../service';
 import {
   inquirerContinueProcess,
   isNotEmpty,
   loading,
   logging,
-} from 'src/utility';
+} from '../utility';
 import { IReleaseProcessConfig } from './types';
 
 const releaseContentArraryToText = (arr: string[]) =>

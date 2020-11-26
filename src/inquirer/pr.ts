@@ -1,13 +1,13 @@
 import inquirer from 'inquirer';
 
-import { api } from 'src/service';
+import { api } from '../service';
 import {
   IGitFlowBranchInfo,
   IBranchPrInfo,
   IGeneralObject,
   IPullRequestConfig,
-} from 'src/interface';
-import { inquirerConfirmQuestion } from 'src/utility';
+} from '../interface';
+import { inquirerConfirmQuestion } from '../utility';
 import { askPullRequestConfigConfirm } from './confirm';
 
 const getReleaseBranch = async (list: Array<string>) => {

@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 
-import { getToday } from 'src/utility';
+import { getToday } from '../utility';
 import git from './git-service';
 import {
   IGitCommit,
