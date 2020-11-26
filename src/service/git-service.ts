@@ -39,6 +39,7 @@ export default {
     path: string,
     message: string,
     content: string,
+    sha: string,
   ) => {
     return octokit.repos.createOrUpdateFileContents({
       owner: repo.owner,
@@ -46,6 +47,7 @@ export default {
       path,
       message,
       content,
+      sha,
     });
   },
   compareCommits: (head: string, base: string) => {

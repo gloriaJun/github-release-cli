@@ -116,14 +116,21 @@ export const createReleaseAction = async (
     releaseBranch !== basicBranches.master,
   );
   logging.preview({ text: note });
+
   const tagName = getReleaseTagName(latestTag, config);
   await confirmCreateTag(latestTag, tagName);
+  logging.info(EOL);
 
   try {
     loading.start(`create the tag`);
+
+    const verionUpdateCommit = await api.updatePackageVersion(tagName);
+    logging.success(`update the verion on package.json`);
+    logging.url(verionUpdateCommit.html_url);
+
     const html_url = await api.createRelease(
       tagName,
-      basicBranches.master,
+      verionUpdateCommit.sha,
       note,
     );
     logging.success(`Success release ${tagName} from ${releaseBranch} 🎉🎉🎉`);

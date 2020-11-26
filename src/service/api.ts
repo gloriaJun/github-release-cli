@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 
-import { getToday } from '../utility';
+import { fromBase64, getToday, toBase64 } from '../utility';
 import git from './git-service';
 import {
   IGitCommit,
@@ -71,29 +71,33 @@ export default {
     };
   },
 
-  updatePackageVersion: async (prevVersion: string, newVersion: string) => {
+  updatePackageVersion: async (newVersion: string) => {
     const path = 'package.json';
     const getVersion = (ver: string) => {
       const matched = new RegExp('(\\d+\\.){2}.+').exec(ver);
-      return matched ? matched[0] : null;
+      return matched ? matched[0] : '';
     };
 
-    const { data: content } = await git.getContent(path, gitFlowBranch.master);
-    console.log(
-      '#### version => ',
-      prevVersion,
-      getVersion(prevVersion),
-      newVersion,
-      getVersion(newVersion),
-    );
-    console.log('#### content => ', content);
+    const {
+      data: { sha, content },
+    } = await git.getContent(path, gitFlowBranch.master);
 
-    // const { data } = await git.createOrUpdateFileContents(
-    //   path,
-    //   `update release version ${newVersion}`,
-    //   '',
-    // );
-    // console.log('#### updated data => ', data);
+    const regexp = new RegExp('("version":\\s+)"((\\d\\.){2}\\d)"');
+    const newScript = fromBase64(content).replace(
+      regexp,
+      `$1"${getVersion(newVersion)}"`,
+    );
+
+    const {
+      data: { commit },
+    } = await git.createOrUpdateFileContents(
+      path,
+      `chore: update release version ${newVersion}`,
+      toBase64(newScript),
+      sha,
+    );
+
+    return commit;
   },
 
   createRelease: async (tagName: string, target: string, body?: string) => {
