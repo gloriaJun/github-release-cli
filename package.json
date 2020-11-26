@@ -1,6 +1,6 @@
 {
   "name": "grmc",
-  "version": "1.0.2",
+  "version": "0.3.0",
   "description": "git release management command-line tool",
   "repository": "https://github.com/gloriaJun/github-release-cli.git",
   "author": "gloriaJun <pureainu@gmail.com>",
