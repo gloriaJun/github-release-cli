@@ -1,18 +1,18 @@
 import inquirer from 'inquirer';
 
-import { getBranchList } from '../api';
+import { api } from '../service';
 import {
   IGitFlowBranchInfo,
   IBranchPrInfo,
   IGeneralObject,
   IPullRequestConfig,
 } from '../interface';
+import { inquirerConfirmQuestion } from '../utility';
 import { askPullRequestConfigConfirm } from './confirm';
-import { inquirerConfirmQuestion } from './shared';
 
 const getReleaseBranch = async (list: Array<string>) => {
   if (!list || list.length === 0) {
-    throw `[Error] The selectable branch list is empty ... ✋`;
+    throw `The selectable branch list is empty ... ✋`;
   }
 
   const { branch } = (await inquirer.prompt([
@@ -83,28 +83,26 @@ const checkPullRequestToOtherBranch = async (
 };
 
 export const askPullRequestProcess = async (
-  prefix: string,
+  prefixList: string[],
   gitFlowBranchInfo: IGitFlowBranchInfo,
 ): Promise<IPullRequestConfig> => {
-  const allList = await getBranchList();
+  const branchList = await api.getBranchList();
 
-  const releaseBranchList = allList.filter((v) => new RegExp(prefix).test(v));
+  const releaseBranchList = prefixList.reduce((result: string[], prefix) => {
+    return result.concat(branchList.filter((v) => new RegExp(prefix).test(v)));
+  }, []);
 
   const relBranch = await getReleaseBranch(releaseBranchList);
   const targetPrBranchInfo = await checkPullRequestToOtherBranch(
     gitFlowBranchInfo,
-    allList.filter((v) => !releaseBranchList.includes(v)),
+    branchList.filter((v) => !releaseBranchList.includes(v)),
   );
 
   const config = {
     relBranch,
     targetPrBranchInfo,
   };
-
-  const answer = await askPullRequestConfigConfirm(config);
-  if (!answer) {
-    throw `Canceled Process ... ✋`;
-  }
+  await askPullRequestConfigConfirm(config);
 
   return config;
 };

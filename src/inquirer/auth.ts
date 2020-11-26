@@ -1,4 +1,4 @@
-import { inquirerRequiredQuestion } from './shared';
+import { inquirerRequiredQuestion } from '../utility';
 
 export const getBaseApiUrl = async () => {
   return await inquirerRequiredQuestion(
