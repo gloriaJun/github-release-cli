@@ -2,7 +2,7 @@ import { EOL } from 'os';
 import semver from 'semver';
 
 import { api } from '../service';
-import { loading, logging } from '../utility';
+import { isEmpty, loading, logging } from '../utility';
 import { IReleaseProcessConfig } from './types';
 
 const getReleaseTagName = (
@@ -22,6 +22,10 @@ const generateReleaseNote = async (
   latestTagCommitHash: string,
   isGenerateFromPr = true,
 ) => {
+  if (isEmpty(latestTagCommitHash)) {
+    return 'Initial Release';
+  }
+
   const { html_url, list: commitList } = await api.getCommitList(
     branch,
     latestTagCommitHash,

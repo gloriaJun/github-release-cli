@@ -35,11 +35,11 @@ export default {
 
   getLatestTag: async () => {
     const { data } = await git.listTags();
-    const item = data[0];
+    const item = data[0] || {};
 
     return {
       tag: item.name,
-      sha: item.commit.sha,
+      sha: item.commit?.sha,
     };
   },
 
