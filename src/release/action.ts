@@ -26,8 +26,9 @@ const generateReleaseNote = async (
     return 'Initial Release';
   }
 
+  const { commit } = await api.getBranchInfo(branch);
   const { html_url, list: commitList } = await api.getCommitList(
-    branch,
+    commit.sha,
     latestTagCommitHash,
   );
   const list = isGenerateFromPr
