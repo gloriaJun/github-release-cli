@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 
-import { IGitAuthConfig, IReleaseConfig } from './interface';
-import { loading } from './utility';
+import { IGitAuthConfig, IReleaseConfig } from '../interface';
+import { loading } from '../utility';
 
 let octokit: Octokit;
 let owner: string;
@@ -80,6 +80,33 @@ export const getPullRequestList = async (base: string) => {
     repo,
     base,
     state: 'closed',
+  });
+
+  return data;
+};
+
+export const getContent = async (path: string, ref?: string) => {
+  const { data } = await octokit.repos.getContent({
+    owner,
+    repo,
+    path,
+    ref,
+  });
+
+  return data;
+};
+
+export const createOrUpdateFileContents = async (
+  path: string,
+  message: string,
+  content: string,
+) => {
+  const { data } = await octokit.repos.createOrUpdateFileContents({
+    owner,
+    repo,
+    path,
+    message,
+    content,
   });
 
   return data;
