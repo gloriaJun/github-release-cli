@@ -9,15 +9,9 @@ export interface IGitFlowBranch {
   release: string;
   hotfix: string;
 }
-
 export interface IGitPullRequest {
-  number: number;
   title: string;
   sha: string;
+  prNumber?: number;
   milestoneHtmlUrl?: string; // html url about milestone
-}
-
-export interface IGitCommit {
-  title: string;
-  sha: string;
 }

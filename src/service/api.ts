@@ -2,12 +2,7 @@ import { EOL } from 'os';
 
 import { fromBase64, getToday, toBase64 } from '../utility';
 import git from './git-service';
-import {
-  IGitCommit,
-  IGitFlowBranch,
-  IGitPullRequest,
-  IGitRepository,
-} from './types';
+import { IGitFlowBranch, IGitPullRequest, IGitRepository } from './types';
 
 let gitFlowBranch: IGitFlowBranch;
 
@@ -54,10 +49,10 @@ export default {
     } = await git.compareCommits(head, base);
 
     const list = commits.reduce(
-      (result: Array<IGitCommit>, { commit, sha }) => {
-        console.log('### commit message', commit.message);
+      (result: Array<IGitPullRequest>, { commit, sha }) => {
         result.push({
-          title: commit.message.replace(new RegExp(EOL + EOL, 'g'), EOL),
+          // title: commit.message.replace(new RegExp(EOL + EOL, 'g'), EOL),
+          title: commit.message.split(EOL)[0],
           sha,
         });
         return result;
@@ -151,7 +146,7 @@ export default {
       ) => {
         result.push({
           title,
-          number,
+          prNumber: number,
           sha: merge_commit_sha,
           milestoneHtmlUrl: milestone?.html_url,
         });
