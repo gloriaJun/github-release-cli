@@ -100,6 +100,23 @@ const generateReleaseNote = async (
   }
 };
 
+const updatePackageVersionAction = async (tagName: string) => {
+  try {
+    const title = `update the verion on package.json`;
+    loading.start(title);
+
+    const verionUpdateCommit = await api.updatePackageVersion(tagName);
+
+    logging.success(title);
+    logging.url(verionUpdateCommit.html_url);
+    logging.newLine();
+
+    return verionUpdateCommit.sha;
+  } finally {
+    loading.stop();
+  }
+};
+
 export const createReleaseAction = async (
   releaseBranch: string,
   config: IReleaseProcessConfig,
@@ -124,15 +141,9 @@ export const createReleaseAction = async (
   try {
     loading.start(`create the tag`);
 
-    const verionUpdateCommit = await api.updatePackageVersion(tagName);
-    logging.success(`update the verion on package.json`);
-    logging.url(verionUpdateCommit.html_url);
+    const verionUpdateSha = await updatePackageVersionAction(tagName);
 
-    const html_url = await api.createRelease(
-      tagName,
-      verionUpdateCommit.sha,
-      note,
-    );
+    const html_url = await api.createRelease(tagName, verionUpdateSha, note);
     logging.success(`Success release ${tagName} from ${releaseBranch} 🎉🎉🎉`);
     logging.url(html_url);
   } finally {

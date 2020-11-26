@@ -1,5 +1,3 @@
-import { EOL } from 'os';
-
 import { pullRequestAction } from '../action';
 import { logging } from '../utility';
 import { IReleaseProcessConfig } from './types';
@@ -9,18 +7,13 @@ export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
   try {
     const { basicBranches } = config;
 
-    let releaseBranch = await pullRequestAction(
+    const releaseBranch = await pullRequestAction(
       [basicBranches.release, basicBranches.hotfix],
       basicBranches,
     );
-    if (releaseBranch) {
-      logging.info(EOL);
-    } else {
-      releaseBranch = basicBranches.master;
-    }
 
     // crate tag and release note
-    await createReleaseAction(releaseBranch, config);
+    await createReleaseAction(releaseBranch || basicBranches.master, config);
   } catch (e) {
     logging.error(e);
   }
