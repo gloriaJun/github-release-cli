@@ -119,13 +119,10 @@ export default {
       baseBranch,
     );
     let isMerged = isAllowMerge;
-    let mergedSha;
 
     if (isAllowMerge) {
       try {
-        const { data } = await git.mergePullRequest(number);
-        console.log('merge --> ', data);
-        // mergedSha = data?.sha;
+        await git.mergePullRequest(number);
       } catch (e) {
         isMerged = false;
         console.log('merge failed --> ', e);
@@ -134,7 +131,6 @@ export default {
 
     return {
       isMerged,
-      mergedSha,
       html_url,
     };
   },
