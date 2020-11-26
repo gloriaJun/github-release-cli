@@ -46,7 +46,11 @@ export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
     const verionUpdateSha = await updatePackageVersionAction(newTag);
     await createReleaseAction(newTag, verionUpdateSha, note);
 
-    logging.success(`Success release ${newTag} from ${releaseBranch} 🎉🎉🎉`);
+    logging.newLine();
+    logging.success(
+      `🎉🎉🎉 Success release ${newTag} from ${releaseBranch} 🎉🎉🎉`,
+    );
+    logging.newLine();
   } catch (e) {
     logging.error(e);
   }
