@@ -2,7 +2,7 @@ import { EOL } from 'os';
 
 import { pullRequestAction } from '../action';
 import { logging } from '../utility';
-import { IReleaseProcessConfig } from './interface';
+import { IReleaseProcessConfig } from './types';
 import { createReleaseAction } from './action';
 
 export const runReleaseProcess = async (config: IReleaseProcessConfig) => {

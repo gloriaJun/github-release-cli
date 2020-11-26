@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 
 import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './inquirer';
-import { setGitApiService } from './api';
+import { api } from './service';
 import {
   isNotEmpty,
   parseEnvConfigByKey,
@@ -24,12 +24,10 @@ const setBranchPrefix = (info: IGitFlowBranchInfo) => {
 export const setConfiguration = async (path: string) => {
   dotenv.config({ path });
 
-  setGitApiService({
-    baseUrl: await parseEnvConfigByKey('BASE_URL', getBaseApiUrl),
-    token: await parseEnvConfigByKey('TOKEN', getToken),
-    owner: await parseEnvConfigByKey('REPO_OWNER', getRepoOwner),
-    repo: await parseEnvConfigByKey('REPO_NAME', getRepoName),
-  });
+  const baseUrl = await parseEnvConfigByKey('BASE_URL', getBaseApiUrl);
+  const token = await parseEnvConfigByKey('TOKEN', getToken);
+  const owner = await parseEnvConfigByKey('REPO_OWNER', getRepoOwner);
+  const name = await parseEnvConfigByKey('REPO_NAME', getRepoName);
 
   const basicBranches = setBranchPrefix({
     master: parseEnvConfigString('MASTER'),
@@ -37,6 +35,8 @@ export const setConfiguration = async (path: string) => {
     release: parseEnvConfigString('RELEASE'),
     hotfix: parseEnvConfigString('HOTFIX'),
   });
+
+  api.setConfiguration(baseUrl, token, { owner, name }, basicBranches);
 
   return {
     basicBranches,
