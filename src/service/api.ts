@@ -122,8 +122,7 @@ export default {
 
     if (isAllowMerge) {
       try {
-        const result = await git.mergePullRequest(number);
-        console.log('### merge result', result);
+        await git.mergePullRequest(number);
       } catch (e) {
         isMerged = false;
         console.log('merge failed --> ', e);
