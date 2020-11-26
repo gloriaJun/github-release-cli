@@ -59,29 +59,20 @@ const generateReleaseNote = async (
         html_url;
 };
 
-export const prepareReleaseAction = async (
-  releaseBranch: string,
-  config: IReleaseProcessConfig,
-) => {
-  const title = `generate the release note content`;
+export const getTagAction = async (config: IReleaseProcessConfig) => {
+  const title = `get new tag verion`;
   let result;
 
   try {
     loading.start(title);
 
     const { tag: prevTag, sha: prevTagSha } = await api.getLatestTag();
-
-    const note = await generateReleaseNote(
-      releaseBranch,
-      prevTagSha,
-      releaseBranch !== config.basicBranches.master,
-    );
     const newTag = getReleaseTagName(prevTag, config);
 
     result = {
       prevTag,
       newTag,
-      note,
+      prevTagSha,
     };
   } finally {
     loading.stop();
@@ -89,6 +80,30 @@ export const prepareReleaseAction = async (
 
   logging.success(`success ${title}`);
   return result;
+};
+
+export const generateChagneLogAction = async (
+  releaseBranch: string,
+  latestTagCommitHash: string,
+  config: IReleaseProcessConfig,
+) => {
+  const title = `generate the release note content`;
+  let note;
+
+  try {
+    loading.start(title);
+
+    note = await generateReleaseNote(
+      releaseBranch,
+      latestTagCommitHash,
+      releaseBranch !== config.basicBranches.master,
+    );
+  } finally {
+    loading.stop();
+  }
+
+  logging.success(`success ${title}`);
+  return note;
 };
 
 export const updatePackageVersionAction = async (tagName: string) => {
