@@ -3,14 +3,15 @@ import { inquirerContinueProcess, isNotEmpty, logging } from '../utility';
 import { IReleaseProcessConfig } from './types';
 import {
   createReleaseAction,
-  prepareReleaseAction,
+  getTagAction,
+  generateChagneLogAction,
   updatePackageVersionAction,
 } from './action';
 
 const confirmCreateTag = async (lastestTag: string, newTag: string) => {
   await inquirerContinueProcess(
     [
-      `Do you want to create the tag `,
+      `Do you want to do the release process `,
       '(',
       isNotEmpty(lastestTag) ? `${lastestTag} -> ` : '',
       newTag,
@@ -24,6 +25,9 @@ export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
   try {
     const { basicBranches } = config;
 
+    const { prevTag, newTag, prevTagSha } = await getTagAction(config);
+    await confirmCreateTag(prevTag, newTag);
+
     const releaseBranch =
       (await pullRequestAction(
         [basicBranches.release, basicBranches.hotfix],
@@ -31,16 +35,16 @@ export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
       )) || basicBranches.master;
 
     // crate tag and release note
-    // await createTagAndRelease(releaseBranch, config);
     logging.stepTitle(`Start create tag and release note from`, releaseBranch);
 
-    const { prevTag, newTag, note } = await prepareReleaseAction(
+    const note = await generateChagneLogAction(
       releaseBranch,
+      prevTagSha,
       config,
     );
     logging.preview({ text: note });
 
-    await confirmCreateTag(prevTag, newTag);
+    await inquirerContinueProcess();
     logging.newLine();
 
     const verionUpdateSha = await updatePackageVersionAction(newTag);
