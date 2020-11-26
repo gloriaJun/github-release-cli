@@ -11,6 +11,10 @@ const log = (...args: any[]) => {
   console.log(...args);
 };
 
+const newLine = () => {
+  log(EOL);
+};
+
 export default {
   info: (message: string) => {
     log(message);
@@ -22,11 +26,15 @@ export default {
     log(chalk.green(`✔`), message);
   },
   error: (...args: any[]) => {
-    console.error(chalk.bgBlack.red('ERROR!!!'), ...args, EOL);
+    console.error(chalk.bgBlack.red('ERROR!!!'), ...args);
+    newLine();
   },
+  newLine,
+
   // about the processing step
   stepTitle: (title: string, info?: string) => {
-    log(`${EOL}🚀 ${title}`, info ? chalk.bold(info) : '');
+    newLine();
+    log(`🚀 ${title}`, info ? chalk.bold(info) : '');
   },
   preview: ({ title, text }: IGeneralObject<string>) => {
     if (!isEmpty(text)) {

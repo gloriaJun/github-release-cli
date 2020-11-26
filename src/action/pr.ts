@@ -1,7 +1,7 @@
-import { createPullRequest, mergePullRequest } from '../api';
+import { api } from '../service';
 import { askPullRequestProcess } from '../inquirer';
 import { IGitFlowBranchInfo } from '../interface';
-import { inquirerConfirmQuestion, logging } from '../utility';
+import { inquirerConfirmQuestion, loading, logging } from '../utility';
 
 export const pullRequestAction = async (
   prefixLsit: string[],
@@ -22,28 +22,33 @@ export const pullRequestAction = async (
     gitFlowBranchInfo,
   );
 
-  const promises = Object.keys(targetPrBranchInfo).map(async (branch) => {
-    const { isCreate, isMerge } = targetPrBranchInfo[branch];
-    if (!isCreate) {
-      return;
-    }
+  try {
+    loading.start(`create & merge pull reqquest from ${relBranch} branch`);
 
-    const { html_url, number } = await createPullRequest(
-      `merge ${relBranch} to ${branch}`,
-      relBranch,
-      branch,
-    );
+    const promises = Object.keys(targetPrBranchInfo).map(async (branch) => {
+      const { isCreate, isMerge: isAllowMerge } = targetPrBranchInfo[branch];
+      if (!isCreate) {
+        return;
+      }
 
-    if (isMerge) {
-      await mergePullRequest(number, branch);
-      logging.success(`Pull Request successfully merged to ${branch} 👍`);
-    } else {
-      logging.success(`Create Pull Request to ${branch} 👍`);
-    }
-    logging.url(html_url);
-  });
+      const { html_url, isMerged } = await api.createReleasePullRequest(
+        relBranch,
+        branch,
+        isAllowMerge,
+      );
 
-  await Promise.all(promises);
+      logging.success(
+        `Pull Request successfully created ${
+          isMerged ? '& merged ' : ''
+        }to ${branch} 👍`,
+      );
+      logging.url(html_url);
+    });
 
-  return relBranch;
+    await Promise.all(promises);
+
+    return relBranch;
+  } finally {
+    loading.stop();
+  }
 };

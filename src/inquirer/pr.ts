@@ -1,14 +1,14 @@
 import inquirer from 'inquirer';
 
-import { getBranchList } from '../api';
+import { api } from '../service';
 import {
   IGitFlowBranchInfo,
   IBranchPrInfo,
   IGeneralObject,
   IPullRequestConfig,
 } from '../interface';
-import { askPullRequestConfigConfirm } from './confirm';
 import { inquirerConfirmQuestion } from '../utility';
+import { askPullRequestConfigConfirm } from './confirm';
 
 const getReleaseBranch = async (list: Array<string>) => {
   if (!list || list.length === 0) {
@@ -86,16 +86,16 @@ export const askPullRequestProcess = async (
   prefixList: string[],
   gitFlowBranchInfo: IGitFlowBranchInfo,
 ): Promise<IPullRequestConfig> => {
-  const allList = await getBranchList();
+  const branchList = await api.getBranchList();
 
   const releaseBranchList = prefixList.reduce((result: string[], prefix) => {
-    return result.concat(allList.filter((v) => new RegExp(prefix).test(v)));
+    return result.concat(branchList.filter((v) => new RegExp(prefix).test(v)));
   }, []);
 
   const relBranch = await getReleaseBranch(releaseBranchList);
   const targetPrBranchInfo = await checkPullRequestToOtherBranch(
     gitFlowBranchInfo,
-    allList.filter((v) => !releaseBranchList.includes(v)),
+    branchList.filter((v) => !releaseBranchList.includes(v)),
   );
 
   const config = {

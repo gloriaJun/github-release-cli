@@ -1,42 +1,14 @@
 import { EOL } from 'os';
 import semver from 'semver';
 
-import {
-  createRelease,
-  getCommitList,
-  getLatestTag,
-  getPullRequestList,
-} from '../api';
-import {
-  getToday,
-  inquirerContinueProcess,
-  isNotEmpty,
-  loading,
-  logging,
-} from '../utility';
-import { IReleaseProcessConfig } from './interface';
-
-const releaseContentArraryToText = (arr: string[]) =>
-  arr.length > 1 ? `${arr.join(EOL)}${EOL}${EOL}` : '';
-
-const confirmCreateTag = async (lastestTag: string, newTag: string) => {
-  await inquirerContinueProcess(
-    [
-      `Do you want to create the tag `,
-      '(',
-      isNotEmpty(lastestTag) ? `${lastestTag} -> ` : '',
-      newTag,
-      ')',
-      ' ?',
-    ].join(''),
-  );
-};
+import { api } from '../service';
+import { loading, logging } from '../utility';
+import { IReleaseProcessConfig } from './types';
 
 const getReleaseTagName = (
   latestTag: string,
   { releaseType, tagPrefix }: IReleaseProcessConfig,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment,,@typescript-eslint/no-unsafe-call
   const newTag = [
     tagPrefix,
     semver.inc(latestTag || '0.0.0', releaseType),
@@ -45,107 +17,108 @@ const getReleaseTagName = (
   return newTag;
 };
 
-const generateReleaseNoteFromPr = async (
+const generateReleaseNote = async (
   branch: string,
   latestTagCommitHash: string,
+  isGenerateFromPr = true,
 ) => {
-  const data = await getPullRequestList(branch);
-  const { html_url } = await getCommitList(latestTagCommitHash, branch);
+  const { html_url, list: commitList } = await api.getCommitList(
+    branch,
+    latestTagCommitHash,
+  );
+  const list = isGenerateFromPr
+    ? await api.getPullRequestList(branch)
+    : commitList;
 
   const milestones: string[] = ['#### Milestone'];
   const changelogs: string[] = ['#### Changelogs'];
 
-  data.map((item) => {
-    const { title, number, merge_commit_sha, milestone } = item;
-
+  list.map(({ title, sha, prNumber, milestoneHtmlUrl }) => {
     changelogs.push(
-      `* ${title} (#${number}) ${
-        merge_commit_sha ? merge_commit_sha.substr(0, 7) : ''
-      }`,
+      `* ${title} ` +
+        (prNumber ? `(#${prNumber}) ` : ``) +
+        `${sha ? sha.substr(0, 7) : ''}`,
     );
 
-    if (milestone && !milestones.includes(milestone.html_url)) {
-      milestones.push(milestone.html_url);
+    if (milestoneHtmlUrl && !milestones.includes(milestoneHtmlUrl)) {
+      milestones.push(milestoneHtmlUrl);
     }
   });
 
-  return (
-    releaseContentArraryToText(changelogs) +
-    releaseContentArraryToText(milestones) +
-    html_url
-  );
+  const releaseContentArraryToText = (arr: string[]) =>
+    arr.length > 1 ? `${arr.join(EOL)}${EOL}${EOL}` : '';
+
+  return list.length === 0
+    ? 'Empty Changelog'
+    : releaseContentArraryToText(changelogs) +
+        releaseContentArraryToText(milestones) +
+        html_url;
 };
 
-const generateReleaseNoteFromCommit = async (
-  branch: string,
-  latestTagCommitHash: string,
-) => {
-  const { html_url, commits } = await getCommitList(
-    latestTagCommitHash,
-    branch,
-  );
-
-  const changelogs: string[] = ['#### Changelogs'];
-
-  commits.map((item) => {
-    const { commit, sha } = item;
-    const message = commit.message.replace(new RegExp(EOL + EOL, 'g'), EOL);
-
-    changelogs.push(`* ${message} ${sha.substr(0, 7)}`);
-  });
-
-  return releaseContentArraryToText(changelogs) + html_url;
-};
-
-const generateReleaseNote = async (
-  branch: string,
-  latestTagCommitHash: string,
-  isGenerateFromPr: boolean,
-) => {
-  try {
-    loading.start(`generate release content`);
-    const note = !isGenerateFromPr
-      ? await generateReleaseNoteFromPr(branch, latestTagCommitHash)
-      : await generateReleaseNoteFromCommit(branch, latestTagCommitHash);
-
-    logging.info(EOL);
-    logging.success(`generated the release note content`);
-    return note;
-  } finally {
-    loading.stop();
-  }
-};
-
-export const createReleaseAction = async (
+export const prepareReleaseAction = async (
   releaseBranch: string,
   config: IReleaseProcessConfig,
 ) => {
-  const { basicBranches } = config;
-
-  logging.stepTitle(`Start create tag and release note from`, releaseBranch);
-
-  const { name: latestTag, commit } = await getLatestTag();
-
-  const note = await generateReleaseNote(
-    releaseBranch,
-    commit.sha,
-    releaseBranch !== basicBranches.master,
-  );
-  logging.preview({ text: note });
-  const tagName = getReleaseTagName(latestTag, config);
-  await confirmCreateTag(latestTag, tagName);
+  const title = `generate the release note content`;
+  let result;
 
   try {
-    loading.start(`create the tag`);
-    const { html_url } = await createRelease({
-      tagName,
-      releaseName: `${tagName} (${getToday()})`,
-      targetCommitish: basicBranches.master,
-      body: note,
-    });
-    logging.success(`Success release ${tagName} from ${releaseBranch} 🎉🎉🎉`);
-    logging.url(html_url);
+    loading.start(title);
+
+    const { tag: prevTag, sha: prevTagSha } = await api.getLatestTag();
+
+    const note = await generateReleaseNote(
+      releaseBranch,
+      prevTagSha,
+      releaseBranch !== config.basicBranches.master,
+    );
+    const newTag = getReleaseTagName(prevTag, config);
+
+    result = {
+      prevTag,
+      newTag,
+      note,
+    };
   } finally {
     loading.stop();
   }
+
+  logging.success(`success ${title}`);
+  return result;
+};
+
+export const updatePackageVersionAction = async (tagName: string) => {
+  const title = `update the verion on package.json`;
+  let result;
+
+  try {
+    loading.start(title);
+    result = await api.updatePackageVersion(tagName);
+  } finally {
+    loading.stop();
+  }
+
+  logging.success(`success ${title}`);
+  logging.url(result.html_url);
+
+  return result.sha;
+};
+
+export const createReleaseAction = async (
+  newTag: string,
+  verionUpdateSha: string,
+  note: string,
+) => {
+  const title = `create release and tag`;
+  let html_url;
+
+  try {
+    loading.start(title);
+    html_url = await api.createRelease(newTag, verionUpdateSha, note);
+  } finally {
+    loading.stop();
+  }
+
+  logging.success(`success ${title}`);
+  logging.url(html_url);
 };
