@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 
-import { IGitAuthConfig, IReleaseConfig } from '../interface';
-import { loading } from '../utility';
+import { IGitAuthConfig, IReleaseConfig } from 'src/interface';
+import { loading } from 'src/utility';
 
 let octokit: Octokit;
 let owner: string;
