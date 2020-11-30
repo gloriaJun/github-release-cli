@@ -55,7 +55,8 @@ export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
       `🎉🎉🎉 Success release ${newTag} from ${releaseBranch} 🎉🎉🎉`,
     );
     logging.newLine();
-  } catch (e) {
-    logging.error(e);
+  } catch (error) {
+    logging.newLine();
+    logging.error(error);
   }
 };

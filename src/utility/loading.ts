@@ -9,4 +9,10 @@ export default {
   stop: () => {
     spinner.stop();
   },
+  success: (message = '') => {
+    spinner.succeed(message);
+  },
+  fail: (message = '') => {
+    spinner.fail(message);
+  },
 };

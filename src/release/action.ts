@@ -1,9 +1,20 @@
 import { EOL } from 'os';
 import semver from 'semver';
+import { RequestError } from '@octokit/types';
 
 import { api } from '../service';
 import { isEmpty, loading, logging } from '../utility';
 import { IReleaseProcessConfig } from './types';
+
+const parseErrormsg = (error: RequestError) => {
+  if (error instanceof Error) {
+    const { status, message, documentation_url } = error;
+
+    return `[${status}] ${message}${EOL}- ${documentation_url}`;
+  } else {
+    return error;
+  }
+};
 
 const getReleaseTagName = (
   latestTag: string,
@@ -60,26 +71,24 @@ const generateReleaseNote = async (
 };
 
 export const getTagAction = async (config: IReleaseProcessConfig) => {
-  const title = `get new tag verion`;
-  let result;
-
   try {
-    loading.start(title);
+    loading.start(`get new tag verion`);
 
     const { tag: prevTag, sha: prevTagSha } = await api.getLatestTag();
     const newTag = getReleaseTagName(prevTag, config);
 
-    result = {
+    loading.success();
+    return {
       prevTag,
       newTag,
       prevTagSha,
     };
+  } catch (e) {
+    loading.fail();
+    throw parseErrormsg(e);
   } finally {
     loading.stop();
   }
-
-  logging.success(`success ${title}`);
-  return result;
 };
 
 export const generateChagneLogAction = async (
@@ -87,40 +96,39 @@ export const generateChagneLogAction = async (
   latestTagCommitHash: string,
   config: IReleaseProcessConfig,
 ) => {
-  const title = `generate the release note content`;
-  let note;
-
   try {
-    loading.start(title);
+    loading.start(`generate the release note content`);
 
-    note = await generateReleaseNote(
+    const note = await generateReleaseNote(
       releaseBranch,
       latestTagCommitHash,
       config.basicBranches.master,
     );
+
+    loading.success();
+    return note;
+  } catch (e) {
+    loading.fail();
+    throw parseErrormsg(e);
   } finally {
     loading.stop();
   }
-
-  logging.success(`success ${title}`);
-  return note;
 };
 
 export const updatePackageVersionAction = async (tagName: string) => {
-  const title = `update the verion on package.json`;
-  let result;
-
   try {
-    loading.start(title);
-    result = await api.updatePackageVersion(tagName);
+    loading.start(`update the verion on package.json`);
+    const result = await api.updatePackageVersion(tagName);
+
+    loading.success();
+    logging.url(result.html_url);
+    return result.sha;
+  } catch (e) {
+    loading.fail();
+    throw parseErrormsg(e);
   } finally {
     loading.stop();
   }
-
-  logging.success(`success ${title}`);
-  logging.url(result.html_url);
-
-  return result.sha;
 };
 
 export const createReleaseAction = async (
@@ -128,16 +136,16 @@ export const createReleaseAction = async (
   verionUpdateSha: string,
   note: string,
 ) => {
-  const title = `create release and tag`;
-  let html_url;
-
   try {
-    loading.start(title);
-    html_url = await api.createRelease(newTag, verionUpdateSha, note);
+    loading.start(`create release and tag`);
+    const html_url = await api.createRelease(newTag, verionUpdateSha, note);
+
+    loading.success();
+    logging.url(html_url);
+  } catch (e) {
+    loading.fail();
+    throw parseErrormsg(e);
   } finally {
     loading.stop();
   }
-
-  logging.success(`success ${title}`);
-  logging.url(html_url);
 };
