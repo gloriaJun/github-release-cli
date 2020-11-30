@@ -1,11 +1,10 @@
-import { api } from '../service';
-import { askPullRequestProcess } from '../inquirer';
-import { IGitFlowBranchInfo } from '../interface';
+import { api, IGitFlowBranch } from '../service';
 import { inquirerConfirmQuestion, loading, logging } from '../utility';
+import { askPullRequestProcess } from './inquirer';
 
 export const pullRequestAction = async (
   prefixLsit: string[],
-  gitFlowBranchInfo: IGitFlowBranchInfo,
+  gitFlowBranchInfo: IGitFlowBranch,
 ) => {
   logging.stepTitle(`Start create pr & merge process`);
 

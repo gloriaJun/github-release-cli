@@ -1,19 +1,18 @@
 import dotenv from 'dotenv';
 
-import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './inquirer';
-import { api } from './service';
 import {
   isNotEmpty,
   parseEnvConfigByKey,
   parseEnvConfigString,
-} from './utility';
-import { IGitFlowBranchInfo } from './interface';
-import { defaultBasicBranches } from './constants';
+} from '../utility';
+import { api, IGitFlowBranch } from '../service';
+import { defaultBasicBranches } from '../constants';
+import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './auth';
 
-const setBranchPrefix = (info: IGitFlowBranchInfo) => {
-  const keys = Object.keys(info) as Array<keyof IGitFlowBranchInfo>;
+const setBranchPrefix = (info: IGitFlowBranch) => {
+  const keys = Object.keys(info) as Array<keyof IGitFlowBranch>;
 
-  return keys.reduce((result, key: keyof IGitFlowBranchInfo) => {
+  return keys.reduce((result, key: keyof IGitFlowBranch) => {
     if (isNotEmpty(info[key])) {
       result[key] = info[key];
     }

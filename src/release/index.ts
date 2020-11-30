@@ -1,4 +1,4 @@
-import { pullRequestAction } from '../action';
+import { pullRequestAction } from '../pr';
 import { inquirerContinueProcess, isNotEmpty, logging } from '../utility';
 import { IReleaseProcessConfig } from './types';
 import {
