@@ -1,13 +1,13 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
-import { api, IGitFlowBranch } from '../service';
-import { IGeneralObject } from '../interface';
+import { api, IGitFlowBranch } from 'src/service';
+import { IGeneralObject } from 'src/interface';
 import {
   inquirerConfirmQuestion,
   inquirerContinueProcess,
   logging,
-} from '../utility';
+} from 'src/utility';
 import { IBranchPrInfo, IPullRequestConfig } from './types';
 
 const getReleaseBranch = async (list: Array<string>) => {

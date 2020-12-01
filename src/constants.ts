@@ -1,4 +1,4 @@
-import { IGitFlowBranch } from './service';
+import { IGitFlowBranch } from 'src/service';
 
 export const pkgVersions = Object.freeze({
   major: 'major',

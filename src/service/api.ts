@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 
-import { fromBase64, getToday, toBase64 } from '../utility';
+import { fromBase64, getToday, toBase64 } from 'src/utility';
 import git from './git-service';
 import { IGitFlowBranch, IGitPullRequest, IGitRepository } from './types';
 

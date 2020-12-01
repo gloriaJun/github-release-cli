@@ -1,4 +1,4 @@
-import { IGeneralObject } from '../interface';
+import { IGeneralObject } from 'src/interface';
 
 export interface IBranchPrInfo {
   isCreate: boolean;

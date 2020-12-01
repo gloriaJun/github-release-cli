@@ -4,9 +4,9 @@ import {
   isNotEmpty,
   parseEnvConfigByKey,
   parseEnvConfigString,
-} from '../utility';
-import { api, IGitFlowBranch } from '../service';
-import { defaultBasicBranches } from '../constants';
+} from 'src/utility';
+import { api, IGitFlowBranch } from 'src/service';
+import { defaultBasicBranches } from 'src/constants';
 import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './auth';
 
 const setBranchPrefix = (info: IGitFlowBranch) => {
