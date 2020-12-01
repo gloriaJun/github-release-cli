@@ -2,8 +2,8 @@ import { EOL } from 'os';
 import semver from 'semver';
 import { RequestError } from '@octokit/types';
 
-import { api } from '../service';
-import { isEmpty, loading, logging } from '../utility';
+import { api } from 'src/service';
+import { isEmpty, loading, logging } from 'src/utility';
 import { IReleaseProcessConfig } from './types';
 
 const parseErrormsg = (error: RequestError) => {

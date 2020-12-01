@@ -1,11 +1,11 @@
 import commander from 'commander';
 import { exit } from 'process';
 
+import { setConfiguration } from 'src/config';
+import { pkgVersions } from 'src/constants';
+import { runReleaseProcess } from 'src/release';
+import { logging } from 'src/utility';
 import pkg from '../package.json';
-import { setConfiguration } from './config';
-import { pkgVersions } from './constants';
-import { runReleaseProcess } from './release';
-import { logging } from './utility';
 
 const defaultConfigPath = '.env';
 const pkgVersionList = Object.keys(pkgVersions);

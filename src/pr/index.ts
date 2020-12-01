@@ -1,5 +1,5 @@
-import { api, IGitFlowBranch } from '../service';
-import { inquirerConfirmQuestion, loading, logging } from '../utility';
+import { api, IGitFlowBranch } from 'src/service';
+import { inquirerConfirmQuestion, loading, logging } from 'src/utility';
 import { askPullRequestProcess } from './inquirer';
 
 export const pullRequestAction = async (
