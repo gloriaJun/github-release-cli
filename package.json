@@ -5,9 +5,7 @@
   "repository": "https://github.com/gloriaJun/github-release-cli.git",
   "author": "gloriaJun <pureainu@gmail.com>",
   "license": "(MIT OR Apache-2.0)",
-  "bin": {
-    "grmc": "./bin/grmc"
-  },
+  "bin": "./bin/grmc",
   "files": [
     "lib",
     "bin"
