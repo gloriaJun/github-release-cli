@@ -1,4 +1,4 @@
-export function isObject(obj: any): boolean {
+export function isObject(obj: unknown): boolean {
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -12,14 +12,16 @@ export const isEmpty = (str: string | undefined): boolean => {
   return !str || str.trim().length === 0;
 };
 
-export function isEmptyObject(obj: any): boolean {
+export function isEmptyObject(obj: unknown): boolean {
   if (!isObject(obj)) {
     return false;
   }
 
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      return false;
+  if (typeof obj === 'object') {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        return false;
+      }
     }
   }
 
@@ -30,10 +32,10 @@ export const isNotEmpty = (str: string | undefined): boolean => {
   return !isEmpty(str);
 };
 
-export function isUndefined(obj: any): boolean {
+export function isUndefined(obj: unknown): boolean {
   return typeof obj === 'undefined';
 }
 
-export function isUndefinedOrNull(obj: any): boolean {
+export function isUndefinedOrNull(obj: unknown): boolean {
   return isUndefined(obj) || obj === null;
 }

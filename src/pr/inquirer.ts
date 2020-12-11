@@ -8,6 +8,7 @@ import {
   inquirerContinueProcess,
   logging,
 } from 'src/utility';
+
 import { IBranchPrInfo, IPullRequestConfig } from './types';
 
 const getReleaseBranch = async (list: Array<string>) => {

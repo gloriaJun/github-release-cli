@@ -1597,7 +1597,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:^6.0.0, @octokit/types@npm:^6.0.1, @octokit/types@npm:^6.0.3, @octokit/types@npm:^6.1.0":
+"@octokit/types@npm:^6.0.0, @octokit/types@npm:^6.0.1, @octokit/types@npm:^6.0.3, @octokit/types@npm:^6.1.0, @octokit/types@npm:^6.1.1":
   version: 6.1.1
   resolution: "@octokit/types@npm:6.1.1"
   dependencies:
@@ -1797,7 +1797,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^4.7.0":
+"@typescript-eslint/parser@npm:^4.9.1":
   version: 4.9.1
   resolution: "@typescript-eslint/parser@npm:4.9.1"
   dependencies:
@@ -4034,6 +4034,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-import-resolver-babel-module@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "eslint-import-resolver-babel-module@npm:5.2.0"
+  dependencies:
+    pkg-up: ^2.0.0
+    resolve: ^1.10.0
+  peerDependencies:
+    "@babel/core": ^7.0.0-0
+    babel-plugin-module-resolver: ^3.0.0 || ^4.0.0
+  checksum: b0ddfb5071134c00bb0a42b4ca742c8c9ee2e604cfdd788a10525ed233b9e73ef0c08bd0248d1a50cb4fd015fa55c6f2386723b6dbdcf30d5e2ae46afef721f9
+  languageName: node
+  linkType: hard
+
 "eslint-import-resolver-node@npm:^0.3.4":
   version: 0.3.4
   resolution: "eslint-import-resolver-node@npm:0.3.4"
@@ -4041,6 +4054,22 @@ __metadata:
     debug: ^2.6.9
     resolve: ^1.13.1
   checksum: 825e34e662c988ece8229e6956a95f12d2fa19265b429e3e3db14e58bfe72e270c999cda0cfc690793ed6e6a3e49ffa8df0e0a8842d668a1f0f7de5ae1aa36f9
+  languageName: node
+  linkType: hard
+
+"eslint-import-resolver-typescript@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "eslint-import-resolver-typescript@npm:2.3.0"
+  dependencies:
+    debug: ^4.1.1
+    glob: ^7.1.6
+    is-glob: ^4.0.1
+    resolve: ^1.17.0
+    tsconfig-paths: ^3.9.0
+  peerDependencies:
+    eslint: "*"
+    eslint-plugin-import: "*"
+  checksum: 2d2c9e852897f27d7f442f3ee46a84482a4e227ad2aff73acd1dc4a85e0605e12bba194564a81f1ff436588678a8d256679ef9a03c26dc6c6a2ef5f407530315
   languageName: node
   linkType: hard
 
@@ -4898,6 +4927,7 @@ fsevents@^1.2.7:
     "@commitlint/cli": ^11.0.0
     "@commitlint/config-conventional": ^11.0.0
     "@octokit/rest": ^18.0.9
+    "@octokit/types": ^6.1.1
     "@types/commander": ^2.12.2
     "@types/dotenv": ^8.2.0
     "@types/inquirer": ^7.3.1
@@ -4905,13 +4935,15 @@ fsevents@^1.2.7:
     "@types/ora": ^3.2.0
     "@types/semver": ^7.3.4
     "@typescript-eslint/eslint-plugin": ^4.7.0
-    "@typescript-eslint/parser": ^4.7.0
+    "@typescript-eslint/parser": ^4.9.1
     babel-plugin-module-resolver: ^4.0.0
     chalk: ^4.1.0
     commander: ^6.2.0
     dotenv: ^8.2.0
     eslint: ^7.13.0
     eslint-config-prettier: ^6.15.0
+    eslint-import-resolver-babel-module: ^5.2.0
+    eslint-import-resolver-typescript: ^2.3.0
     eslint-plugin-import: ^2.22.1
     eslint-plugin-prettier: ^3.1.4
     husky: ^4.3.0
@@ -7365,6 +7397,15 @@ fsevents@^1.2.7:
   dependencies:
     find-up: ^4.0.0
   checksum: 1956ebf3cf5cc36a5d20e93851fcadd5a786774eb08667078561e72e0ab8ace91fc36a028d5305f0bfe7c89f9bf51886e2a3c8cb2c2620accfa3feb8da3c256b
+  languageName: node
+  linkType: hard
+
+"pkg-up@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "pkg-up@npm:2.0.0"
+  dependencies:
+    find-up: ^2.1.0
+  checksum: 0a8fcbebf0f1aadc7a52c576352a698abef6c389cb00a0847db2d370d05d4c005f855e196d29618b088062f1394711ca6dadd232692ed225511d7e75a198d246
   languageName: node
   linkType: hard
 

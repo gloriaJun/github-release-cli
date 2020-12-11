@@ -7,12 +7,13 @@ module.exports = {
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
+    tsconfigRootDir: __dirname,
     project: './tsconfig.json',
     // warnOnUnsupportedTypeScriptVersion: false,
     sourceType: 'module',
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features,
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'import'],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
@@ -34,10 +35,6 @@ module.exports = {
      */
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     // '@typescript-eslint/no-use-before-define': 'warn',
-
-    /**
-     * react
-     */
 
     /**
      * import
@@ -80,7 +77,12 @@ module.exports = {
     // 'import/no-useless-path-segments': ['error', { noUselessIndex: true }],
     // 'import/prefer-default-export': 'off',
     'import/no-absolute-path': 'error',
-    'import/no-internal-modules': 'error',
+    'import/no-internal-modules': [
+      'error',
+      {
+        allow: ['src/*'],
+      },
+    ],
     'import/no-mutable-exports': 'error',
     'import/no-named-as-default-member': 'error',
     'import/no-named-as-default': 'error',
@@ -98,6 +100,21 @@ module.exports = {
         bundledDependencies: true,
       },
     ],
+  },
+  settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
+    // 'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+      },
+      // 'babel-module': {},
+      // node: {
+      //   extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      // },
+    },
   },
   // overrides: [],
   // ignorePatterns: ['dist', 'node_modules'],
