@@ -1,5 +1,5 @@
-import { pullRequestAction } from '../action';
-import { inquirerContinueProcess, isNotEmpty, logging } from '../utility';
+import { pullRequestAction } from 'src/pr';
+import { inquirerContinueProcess, isNotEmpty, logging } from 'src/utility';
 import { IReleaseProcessConfig } from './types';
 import {
   createReleaseAction,
@@ -55,7 +55,8 @@ export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
       `🎉🎉🎉 Success release ${newTag} from ${releaseBranch} 🎉🎉🎉`,
     );
     logging.newLine();
-  } catch (e) {
-    logging.error(e);
+  } catch (error) {
+    logging.newLine();
+    logging.error(error);
   }
 };

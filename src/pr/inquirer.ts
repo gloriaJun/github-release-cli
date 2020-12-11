@@ -1,14 +1,14 @@
 import inquirer from 'inquirer';
+import chalk from 'chalk';
 
-import { api } from '../service';
+import { api, IGitFlowBranch } from 'src/service';
+import { IGeneralObject } from 'src/interface';
 import {
-  IGitFlowBranchInfo,
-  IBranchPrInfo,
-  IGeneralObject,
-  IPullRequestConfig,
-} from '../interface';
-import { inquirerConfirmQuestion } from '../utility';
-import { askPullRequestConfigConfirm } from './confirm';
+  inquirerConfirmQuestion,
+  inquirerContinueProcess,
+  logging,
+} from 'src/utility';
+import { IBranchPrInfo, IPullRequestConfig } from './types';
 
 const getReleaseBranch = async (list: Array<string>) => {
   if (!list || list.length === 0) {
@@ -28,7 +28,7 @@ const getReleaseBranch = async (list: Array<string>) => {
 };
 
 const getTargetBranchList = (
-  basicBranchInfo: IGitFlowBranchInfo,
+  basicBranchInfo: IGitFlowBranch,
   list: Array<string>,
 ) => {
   const targetBranchList = [basicBranchInfo.master];
@@ -47,7 +47,7 @@ const getTargetBranchList = (
 };
 
 const checkPullRequestToOtherBranch = async (
-  basicBranchInfo: IGitFlowBranchInfo,
+  basicBranchInfo: IGitFlowBranch,
   list: Array<string>,
 ) => {
   const targetBranchList = getTargetBranchList(basicBranchInfo, list);
@@ -82,9 +82,35 @@ const checkPullRequestToOtherBranch = async (
   return targetBranchAnswer;
 };
 
+const askPullRequestConfigConfirm = async ({
+  relBranch,
+  targetPrBranchInfo,
+}: IPullRequestConfig) => {
+  logging.info('\n======================================');
+  logging.info('Pull Request & Merge Configuration');
+  logging.info('======================================');
+
+  logging.infoKeyValue('Release Branch', relBranch);
+
+  logging.info('\nTarget Branch List');
+  Object.keys(targetPrBranchInfo).map((k) => {
+    const isYN = (v: boolean) => (v ? chalk.green('Y') : chalk.grey('N'));
+    const obj = targetPrBranchInfo[k];
+
+    if (obj.isCreate) {
+      logging.infoKeyValue(
+        `  - ${k}`,
+        `PR(${isYN(obj.isCreate)}), Merge(${isYN(obj.isMerge)})`,
+      );
+    }
+  });
+
+  await inquirerContinueProcess();
+};
+
 export const askPullRequestProcess = async (
   prefixList: string[],
-  gitFlowBranchInfo: IGitFlowBranchInfo,
+  gitFlowBranchInfo: IGitFlowBranch,
 ): Promise<IPullRequestConfig> => {
   const branchList = await api.getBranchList();
 

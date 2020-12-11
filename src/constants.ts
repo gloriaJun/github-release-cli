@@ -1,4 +1,4 @@
-import { IGitFlowBranchInfo } from './interface';
+import { IGitFlowBranch } from 'src/service';
 
 export const pkgVersions = Object.freeze({
   major: 'major',
@@ -6,7 +6,7 @@ export const pkgVersions = Object.freeze({
   patch: 'patch',
 });
 
-export const defaultBasicBranches: IGitFlowBranchInfo = {
+export const defaultBasicBranches: IGitFlowBranch = {
   master: 'main',
   develop: 'develop',
   release: 'release/',
