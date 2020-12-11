@@ -5,6 +5,7 @@ import { setConfiguration } from 'src/config';
 import { pkgVersions } from 'src/constants';
 import { runReleaseProcess } from 'src/release';
 import { logging } from 'src/utility';
+
 import pkg from '../package.json';
 
 const defaultConfigPath = '.env';

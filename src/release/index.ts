@@ -1,5 +1,6 @@
 import { pullRequestAction } from 'src/pr';
 import { inquirerContinueProcess, isNotEmpty, logging } from 'src/utility';
+
 import { IReleaseProcessConfig } from './types';
 import {
   createReleaseAction,

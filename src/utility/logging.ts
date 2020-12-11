@@ -2,8 +2,9 @@ import { EOL } from 'os';
 import pad from 'pad';
 import chalk from 'chalk';
 
-import { isEmpty } from './object';
 import { IGeneralObject } from '../interface';
+
+import { isEmpty } from './object';
 
 const paddingSize = 20;
 

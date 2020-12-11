@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 
 import {
   isNotEmpty,
@@ -7,6 +7,7 @@ import {
 } from 'src/utility';
 import { api, IGitFlowBranch } from 'src/service';
 import { defaultBasicBranches } from 'src/constants';
+
 import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './auth';
 
 const setBranchPrefix = (info: IGitFlowBranch) => {
