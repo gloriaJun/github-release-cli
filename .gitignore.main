@@ -26,6 +26,9 @@ lib/
 .env.test.local
 .env.production.local
 
+# config
+.config/release.yml
+
 # log
 *.log*
 npm-debug.log*
