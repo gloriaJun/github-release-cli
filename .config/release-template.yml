@@ -1,0 +1,18 @@
+baseUrl: https://api.github.com
+token:
+
+repo: { owner, name }
+
+branch: { master: master, develop: develop, release: release, hotfix: hotfix }
+
+tag: { prefix: v }
+
+release:
+  {
+    title:
+      {
+        major: major/%tag_name%,
+        minor: minor/%tag_name%,
+        patch: patch/%tag_name%,
+      },
+  }
