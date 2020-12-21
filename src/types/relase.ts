@@ -1,13 +1,11 @@
-import { IGitFlowBranch, IGitRepository } from './git';
+import { IGitFlowBranch, IGitRepository, IGitTag } from './git';
 
 export interface IReleaseConfig {
   baseUrl: string;
   token: string;
   repo: IGitRepository;
   branch: IGitFlowBranch;
-  tag?: {
-    prefix?: string;
-  };
+  tag?: IGitTag;
   release: {
     title: {
       major: string;

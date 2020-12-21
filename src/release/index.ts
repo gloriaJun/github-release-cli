@@ -1,7 +1,7 @@
 import { pullRequestAction } from 'src/pr';
 import { inquirerContinueProcess, isNotEmpty, logging } from 'src/utility';
+import { IReleaseConfig, IReleaseType } from 'src/types';
 
-import { IReleaseProcessConfig } from './types';
 import {
   createReleaseAction,
   getTagAction,
@@ -22,11 +22,17 @@ const confirmCreateTag = async (lastestTag: string, newTag: string) => {
   );
 };
 
-export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
+export const runReleaseProcess = async (
+  releaseType: IReleaseType,
+  releaseConfig: IReleaseConfig,
+) => {
   try {
-    const { basicBranches } = config;
+    const basicBranches = releaseConfig.branch;
 
-    const { prevTag, newTag, prevTagSha } = await getTagAction(config);
+    const { prevTag, newTag, prevTagSha } = await getTagAction(
+      releaseType,
+      releaseConfig.tag,
+    );
     await confirmCreateTag(prevTag, newTag);
 
     const releaseBranch =
@@ -41,7 +47,7 @@ export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
     const note = await generateChagneLogAction(
       releaseBranch,
       prevTagSha,
-      config,
+      basicBranches.master,
     );
     logging.preview({ text: note });
 

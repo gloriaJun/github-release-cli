@@ -1,21 +1,20 @@
 import { EOL } from 'os';
 
 import { fromBase64, getToday, toBase64 } from 'src/utility';
+import { IGitFlowBranch, IGitPullRequest, IReleaseConfig } from 'src/types';
 
 import git from './git-service';
-import { IGitFlowBranch, IGitPullRequest, IGitRepository } from './types';
 
 let gitFlowBranch: IGitFlowBranch;
 
 export default {
-  setConfiguration: (
-    baseUrl: string,
-    token: string,
-    options: IGitRepository,
-    branches: IGitFlowBranch,
-  ) => {
-    gitFlowBranch = branches;
-    git.configure(baseUrl, token, options);
+  setConfiguration: (releaseConfig: IReleaseConfig) => {
+    gitFlowBranch = releaseConfig.branch;
+    git.configure(
+      releaseConfig.baseUrl,
+      releaseConfig.token,
+      releaseConfig.repo,
+    );
   },
 
   getBranchList: async () => {
@@ -51,11 +50,13 @@ export default {
 
     const list = commits.reduce(
       (result: Array<IGitPullRequest>, { commit, sha }) => {
-        result.push({
-          // title: commit.message.replace(new RegExp(EOL + EOL, 'g'), EOL),
-          title: commit.message.split(EOL)[0],
-          sha,
-        });
+        if (sha) {
+          result.push({
+            // title: commit.message.replace(new RegExp(EOL + EOL, 'g'), EOL),
+            title: commit.message.split(EOL)[0],
+            sha,
+          });
+        }
         return result;
       },
       [],
@@ -74,9 +75,10 @@ export default {
       return matched ? matched[0] : '';
     };
 
-    const {
-      data: { sha, content },
-    } = await git.getContent(path, gitFlowBranch.master);
+    const { sha, content } = await git.getFileContent(
+      path,
+      gitFlowBranch.master,
+    );
 
     const regexp = new RegExp('("version":\\s+)"((\\d\\.){2}\\d)"');
     const newScript = fromBase64(content).replace(
@@ -145,12 +147,14 @@ export default {
         result: Array<IGitPullRequest>,
         { title, number, merge_commit_sha, milestone },
       ) => {
-        result.push({
-          title,
-          prNumber: number,
-          sha: merge_commit_sha,
-          milestoneHtmlUrl: milestone?.html_url,
-        });
+        if (merge_commit_sha) {
+          result.push({
+            title,
+            prNumber: number,
+            sha: merge_commit_sha,
+            milestoneHtmlUrl: milestone?.html_url,
+          });
+        }
         return result;
       },
       [],

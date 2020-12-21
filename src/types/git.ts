@@ -17,6 +17,10 @@ export const gitFlowBranchDefaultModel: IGitFlowBranch = {
   hotfix: 'hotfix/',
 } as const;
 
+export interface IGitTag {
+  prefix?: string;
+}
+
 export interface IGitPullRequest {
   title: string;
   sha: string;
