@@ -1,6 +1,9 @@
 import { Octokit } from '@octokit/rest';
+import { components } from '@octokit/openapi-types';
 
-import { IGitRepository } from './types';
+import { IGitRepository } from 'src/types';
+
+type GetRepoContentResponseDataFile = components['schemas']['content-file'];
 
 let octokit: Octokit;
 let repo: IGitRepository;
@@ -27,13 +30,19 @@ export default {
       branch,
     });
   },
-  getContent: (path: string, ref?: string) => {
-    return octokit.repos.getContent({
+  getFileContent: async (path: string, ref?: string) => {
+    const { data } = await octokit.repos.getContent({
       owner: repo.owner,
       repo: repo.name,
       path,
       ref,
     });
+
+    if (!data || Array.isArray(data)) {
+      throw 'path is not file type';
+    }
+
+    return data as GetRepoContentResponseDataFile;
   },
   createOrUpdateFileContents: (
     path: string,

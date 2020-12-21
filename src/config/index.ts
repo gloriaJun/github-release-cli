@@ -1,45 +1,66 @@
-import * as dotenv from 'dotenv';
+import * as jsYaml from 'js-yaml';
+import fs from 'fs';
 
-import {
-  isNotEmpty,
-  parseEnvConfigByKey,
-  parseEnvConfigString,
-} from 'src/utility';
-import { api, IGitFlowBranch } from 'src/service';
-import { defaultBasicBranches } from 'src/constants';
+import { isEmpty } from 'src/utility';
+import { gitFlowBranchDefaultModel, IReleaseConfig } from 'src/types';
 
 import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './auth';
 
-const setBranchPrefix = (info: IGitFlowBranch) => {
-  const keys = Object.keys(info) as Array<keyof IGitFlowBranch>;
+let config: IReleaseConfig;
 
-  return keys.reduce((result, key: keyof IGitFlowBranch) => {
-    if (isNotEmpty(info[key])) {
-      result[key] = info[key];
-    }
-    return result;
-  }, defaultBasicBranches);
+const loadConfig = (path: string) => {
+  const fileContents = fs.readFileSync(path, 'utf8');
+  return jsYaml.safeLoad(fileContents) as IReleaseConfig;
 };
 
-export const setConfiguration = async (path: string) => {
-  dotenv.config({ path });
+export const loadReleaseConfig = async (path: string) => {
+  const config = loadConfig(path);
 
-  const baseUrl = await parseEnvConfigByKey('BASE_URL', getBaseApiUrl);
-  const token = await parseEnvConfigByKey('TOKEN', getToken);
-  const owner = await parseEnvConfigByKey('REPO_OWNER', getRepoOwner);
-  const name = await parseEnvConfigByKey('REPO_NAME', getRepoName);
+  if (isEmpty(config.baseUrl)) {
+    config.baseUrl = await getBaseApiUrl();
+  }
 
-  const basicBranches = setBranchPrefix({
-    master: parseEnvConfigString('MASTER'),
-    develop: parseEnvConfigString('DEVELOP'),
-    release: parseEnvConfigString('RELEASE'),
-    hotfix: parseEnvConfigString('HOTFIX'),
-  });
+  if (isEmpty(config.token)) {
+    config.token = await getToken();
+  }
 
-  api.setConfiguration(baseUrl, token, { owner, name }, basicBranches);
+  if (isEmpty(config.repo.owner)) {
+    config.repo.owner = await getRepoOwner();
+  }
 
-  return {
-    basicBranches,
-    tagPrefix: parseEnvConfigString('TAG_PREFIX'),
-  };
+  if (isEmpty(config.repo.name)) {
+    config.repo.name = await getRepoName();
+  }
+
+  config.branch = Object.assign(gitFlowBranchDefaultModel, config.branch);
+
+  return config;
+};
+
+export default {
+  set: async (path: string) => {
+    config = loadConfig(path);
+
+    if (isEmpty(config.baseUrl)) {
+      config.baseUrl = await getBaseApiUrl();
+    }
+
+    if (isEmpty(config.token)) {
+      config.token = await getToken();
+    }
+
+    if (isEmpty(config.repo.owner)) {
+      config.repo.owner = await getRepoOwner();
+    }
+
+    if (isEmpty(config.repo.name)) {
+      config.repo.name = await getRepoName();
+    }
+
+    config.branch = Object.assign(gitFlowBranchDefaultModel, config.branch);
+  },
+
+  get: () => {
+    return config;
+  },
 };

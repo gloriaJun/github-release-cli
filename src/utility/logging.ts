@@ -34,7 +34,6 @@ export default {
 
   // about the processing step
   stepTitle: (title: string, info?: string) => {
-    newLine();
     log(`🚀 ${title}`, info ? chalk.bold(info) : '');
   },
   preview: ({ title, text }: IGeneralObject<string>) => {

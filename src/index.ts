@@ -1,19 +1,21 @@
 import commander from 'commander';
 import { exit } from 'process';
 
-import { setConfiguration } from 'src/config';
-import { pkgVersions } from 'src/constants';
+import { loadReleaseConfig } from 'src/config';
 import { runReleaseProcess } from 'src/release';
 import { logging } from 'src/utility';
+import { api } from 'src/service';
+import { releaseTypes } from 'src/types';
 
 import pkg from '../package.json';
 
-const defaultConfigPath = '.env';
-const pkgVersionList = Object.keys(pkgVersions);
+const defaultConfigPath = '.config/release.yml';
 
 export function run() {
-  const checkCommonOptions = () => {
-    return setConfiguration(commander.config as string);
+  const initConfiguration = async () => {
+    const config = await loadReleaseConfig(commander.config as string);
+    api.setConfiguration(config);
+    return config;
   };
 
   commander
@@ -26,18 +28,17 @@ export function run() {
     .command(`release <type>`)
     .alias('rel')
     .description('excute the release process', {
-      type: pkgVersionList.join(' | '),
+      type: releaseTypes.join(' | '),
     })
     .action(async (type) => {
-      if (!pkgVersionList.includes(type)) {
+      if (!releaseTypes.includes(type)) {
         logging.error(`Invalid release type: `, type);
         exit(1);
       }
 
-      const config = await checkCommonOptions();
-
+      const config = await initConfiguration();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      await runReleaseProcess({ releaseType: type, ...config });
+      await runReleaseProcess(type, config);
     });
 
   commander.parse(process.argv);

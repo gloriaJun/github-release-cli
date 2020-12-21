@@ -1,5 +1,6 @@
-import { api, IGitFlowBranch } from 'src/service';
+import { api } from 'src/service';
 import { inquirerConfirmQuestion, loading, logging } from 'src/utility';
+import { IGitFlowBranch } from 'src/types';
 
 import { askPullRequestProcess } from './inquirer';
 

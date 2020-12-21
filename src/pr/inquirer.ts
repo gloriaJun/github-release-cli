@@ -1,13 +1,14 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
-import { api, IGitFlowBranch } from 'src/service';
+import { api } from 'src/service';
 import { IGeneralObject } from 'src/interface';
 import {
   inquirerConfirmQuestion,
   inquirerContinueProcess,
   logging,
 } from 'src/utility';
+import { IGitFlowBranch } from 'src/types';
 
 import { IBranchPrInfo, IPullRequestConfig } from './types';
 
@@ -32,7 +33,7 @@ const getTargetBranchList = (
   basicBranchInfo: IGitFlowBranch,
   list: Array<string>,
 ) => {
-  const targetBranchList = [basicBranchInfo.master];
+  const targetBranchList: string[] = [basicBranchInfo.master];
 
   if (list.includes(basicBranchInfo.develop)) {
     targetBranchList.push(basicBranchInfo.develop);
@@ -56,7 +57,7 @@ const checkPullRequestToOtherBranch = async (
   const targetBranchAnswer = await targetBranchList.reduce(
     async (promise: Promise<IGeneralObject<IBranchPrInfo>>, branch: string) => {
       const result = await promise.then();
-      const defaultValue = [basicBranchInfo.master].includes(branch);
+      const defaultValue = basicBranchInfo.master === branch;
 
       const isCreate = await inquirerConfirmQuestion({
         message: `Create PR to '${branch}' branch`,

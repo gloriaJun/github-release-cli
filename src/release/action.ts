@@ -4,8 +4,7 @@ import { RequestError } from '@octokit/types';
 
 import { api } from 'src/service';
 import { isEmpty, loading, logging } from 'src/utility';
-
-import { IReleaseProcessConfig } from './types';
+import { IGitTag, IReleaseType } from 'src/types';
 
 const parseErrormsg = (error: RequestError) => {
   if (error instanceof Error) {
@@ -19,11 +18,12 @@ const parseErrormsg = (error: RequestError) => {
 
 const getReleaseTagName = (
   latestTag: string,
-  { releaseType, tagPrefix }: IReleaseProcessConfig,
+  releaseType: string,
+  prefix?: string,
 ) => {
   const newTag = [
-    tagPrefix,
-    semver.inc(latestTag || '0.0.0', releaseType),
+    prefix,
+    semver.inc(latestTag || '0.0.0', releaseType as semver.ReleaseType),
   ].join('');
 
   return newTag;
@@ -38,7 +38,13 @@ const generateReleaseNote = async (
     return 'Initial Release';
   }
 
+  const emptyMessage = 'Empty Changelog';
   const { commit } = await api.getBranchInfo(masterBranch);
+
+  if (!commit.sha) {
+    return emptyMessage;
+  }
+
   const { html_url, list: commitList } = await api.getCommitList(
     commit.sha,
     latestTagCommitHash,
@@ -65,18 +71,21 @@ const generateReleaseNote = async (
     arr.length > 1 ? `${arr.join(EOL)}${EOL}${EOL}` : '';
 
   return list.length === 0
-    ? 'Empty Changelog'
+    ? emptyMessage
     : releaseContentArraryToText(changelogs) +
         releaseContentArraryToText(milestones) +
         html_url;
 };
 
-export const getTagAction = async (config: IReleaseProcessConfig) => {
+export const getTagAction = async (
+  releaseType: IReleaseType,
+  option: IGitTag = {},
+) => {
   try {
     loading.start(`get new tag verion`);
 
     const { tag: prevTag, sha: prevTagSha } = await api.getLatestTag();
-    const newTag = getReleaseTagName(prevTag, config);
+    const newTag = getReleaseTagName(prevTag, releaseType, option.prefix);
 
     loading.success();
     return {
@@ -95,7 +104,7 @@ export const getTagAction = async (config: IReleaseProcessConfig) => {
 export const generateChagneLogAction = async (
   releaseBranch: string,
   latestTagCommitHash: string,
-  config: IReleaseProcessConfig,
+  masterBranch: string,
 ) => {
   try {
     loading.start(`generate the release note content`);
@@ -103,7 +112,7 @@ export const generateChagneLogAction = async (
     const note = await generateReleaseNote(
       releaseBranch,
       latestTagCommitHash,
-      config.basicBranches.master,
+      masterBranch,
     );
 
     loading.success();
