@@ -2,6 +2,7 @@
 
 > git release management command-line tool
 
+[![npm version](https://badge.fury.io/js/grmc.svg)](https://badge.fury.io/js/grmc)
 [![Build Status](https://travis-ci.com/gloriaJun/github-release-cli.svg?branch=main)](https://travis-ci.com/gloriaJun/github-release-cli)
 
 ## Functions
