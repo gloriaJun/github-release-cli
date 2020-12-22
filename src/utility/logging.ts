@@ -8,7 +8,7 @@ import { isEmpty } from './object';
 
 const paddingSize = 20;
 
-const log = (...args: any[]) => {
+const log = (...args: unknown[]) => {
   console.log(...args);
 };
 
@@ -26,7 +26,7 @@ export default {
   success: (message: string) => {
     log(chalk.green(`✔`), message);
   },
-  error: (...args: any[]) => {
+  error: (...args: unknown[]) => {
     console.error(chalk.bgBlack.red('ERROR!!!'), ...args);
     newLine();
   },

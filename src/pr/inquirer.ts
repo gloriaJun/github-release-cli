@@ -8,7 +8,7 @@ import {
   inquirerContinueProcess,
   logging,
 } from 'src/utility';
-import { IGitFlowBranch } from 'src/types';
+import { IBranchType } from 'src/types';
 
 import { IBranchPrInfo, IPullRequestConfig } from './types';
 
@@ -30,7 +30,7 @@ const getReleaseBranch = async (list: Array<string>) => {
 };
 
 const getTargetBranchList = (
-  basicBranchInfo: IGitFlowBranch,
+  basicBranchInfo: IBranchType,
   list: Array<string>,
 ) => {
   const targetBranchList: string[] = [basicBranchInfo.master];
@@ -49,7 +49,7 @@ const getTargetBranchList = (
 };
 
 const checkPullRequestToOtherBranch = async (
-  basicBranchInfo: IGitFlowBranch,
+  basicBranchInfo: IBranchType,
   list: Array<string>,
 ) => {
   const targetBranchList = getTargetBranchList(basicBranchInfo, list);
@@ -112,7 +112,7 @@ const askPullRequestConfigConfirm = async ({
 
 export const askPullRequestProcess = async (
   prefixList: string[],
-  gitFlowBranchInfo: IGitFlowBranch,
+  gitFlowBranchInfo: IBranchType,
 ): Promise<IPullRequestConfig> => {
   const branchList = await api.getBranchList();
 

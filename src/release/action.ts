@@ -4,7 +4,7 @@ import { RequestError } from '@octokit/types';
 
 import { api } from 'src/service';
 import { isEmpty, loading, logging } from 'src/utility';
-import { IGitTag, IReleaseType } from 'src/types';
+import { ITag, IReleaseType } from 'src/types';
 
 const parseErrormsg = (error: RequestError) => {
   if (error instanceof Error) {
@@ -77,9 +77,25 @@ const generateReleaseNote = async (
         html_url;
 };
 
+const updatePackageVersionAction = async (tagName: string) => {
+  try {
+    loading.start(`update the verion on package.json`);
+    const result = await api.updatePackageVersion(tagName);
+
+    loading.success();
+    logging.url(result.html_url);
+    return result.sha;
+  } catch (e) {
+    loading.fail();
+    throw parseErrormsg(e);
+  } finally {
+    loading.stop();
+  }
+};
+
 export const getTagAction = async (
   releaseType: IReleaseType,
-  option: IGitTag = {},
+  option: ITag = {},
 ) => {
   try {
     loading.start(`get new tag verion`);
@@ -125,30 +141,22 @@ export const generateChagneLogAction = async (
   }
 };
 
-export const updatePackageVersionAction = async (tagName: string) => {
-  try {
-    loading.start(`update the verion on package.json`);
-    const result = await api.updatePackageVersion(tagName);
-
-    loading.success();
-    logging.url(result.html_url);
-    return result.sha;
-  } catch (e) {
-    loading.fail();
-    throw parseErrormsg(e);
-  } finally {
-    loading.stop();
-  }
-};
-
 export const createReleaseAction = async (
-  newTag: string,
-  verionUpdateSha: string,
+  tagName: string,
+  releaseName: string,
   note: string,
 ) => {
+  const verionUpdateSha = await updatePackageVersionAction(tagName);
+
   try {
     loading.start(`create release and tag`);
-    const html_url = await api.createRelease(newTag, verionUpdateSha, note);
+
+    const html_url = await api.createRelease({
+      tagName,
+      releaseName,
+      target: verionUpdateSha,
+      body: note,
+    });
 
     loading.success();
     logging.url(html_url);

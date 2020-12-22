@@ -1,11 +1,16 @@
 import { EOL } from 'os';
 
-import { fromBase64, getToday, toBase64 } from 'src/utility';
-import { IGitFlowBranch, IGitPullRequest, IReleaseConfig } from 'src/types';
+import { fromBase64, toBase64 } from 'src/utility';
+import {
+  IBranchType,
+  IGitCreateRelease,
+  IGitPullRequest,
+  IReleaseConfig,
+} from 'src/types';
 
 import git from './git-service';
 
-let gitFlowBranch: IGitFlowBranch;
+let gitFlowBranch: IBranchType;
 
 export default {
   setConfiguration: (releaseConfig: IReleaseConfig) => {
@@ -98,14 +103,8 @@ export default {
     return commit;
   },
 
-  createRelease: async (tagName: string, target: string, body?: string) => {
-    const { data } = await git.createRelease(
-      tagName,
-      `${tagName} (${getToday()})`,
-      target,
-      body,
-    );
-
+  createRelease: async (param: IGitCreateRelease) => {
+    const { data } = await git.createRelease(param);
     return data.html_url;
   },
 

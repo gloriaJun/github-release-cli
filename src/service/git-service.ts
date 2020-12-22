@@ -1,9 +1,10 @@
 import { Octokit } from '@octokit/rest';
-import { components } from '@octokit/openapi-types';
 
-import { IGitRepository } from 'src/types';
-
-type GetRepoContentResponseDataFile = components['schemas']['content-file'];
+import {
+  IGitRepository,
+  GetRepoContentResponseDataFile,
+  IGitCreateRelease,
+} from 'src/types';
 
 let octokit: Octokit;
 let repo: IGitRepository;
@@ -73,12 +74,12 @@ export default {
       repo: repo.name,
     });
   },
-  createRelease: (
-    tagName: string,
-    releaseName: string,
-    target: string,
-    body?: string,
-  ) => {
+  createRelease: ({
+    tagName,
+    releaseName,
+    target,
+    body,
+  }: IGitCreateRelease) => {
     return octokit.repos.createRelease({
       owner: repo.owner,
       repo: repo.name,
