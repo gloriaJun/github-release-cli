@@ -30,9 +30,8 @@ const getReleaseTagName = (
 };
 
 const generateReleaseNote = async (
-  branch: string,
-  latestTagCommitHash: string,
   masterBranch: string,
+  latestTagCommitHash: string,
 ) => {
   if (isEmpty(latestTagCommitHash)) {
     return 'Initial Release';
@@ -45,20 +44,20 @@ const generateReleaseNote = async (
     return emptyMessage;
   }
 
-  const { html_url, list: commitList } = await api.getCommitList(
+  const { html_url, list } = await api.getCommitList(
     commit.sha,
     latestTagCommitHash,
   );
-  const list =
-    branch !== masterBranch ? await api.getPullRequestList(branch) : commitList;
 
   const milestones: string[] = ['#### Milestone'];
   const changelogs: string[] = ['#### Changelogs'];
 
   list.map(({ title, sha, prNumber, milestoneHtmlUrl }) => {
-    const mergeRegExp = new RegExp('^Merge pull request\\s');
+    const ignoreLogPatternRegExp = new RegExp(
+      '((^Merge pull request)|(update release version))\\s',
+    );
 
-    if (mergeRegExp.test(title)) {
+    if (ignoreLogPatternRegExp.test(title)) {
       return;
     }
 
@@ -124,18 +123,13 @@ export const getTagAction = async (
 };
 
 export const generateChagneLogAction = async (
-  releaseBranch: string,
-  latestTagCommitHash: string,
   masterBranch: string,
+  latestTagCommitHash: string,
 ) => {
   try {
     loading.start(`generate the release note content`);
 
-    const note = await generateReleaseNote(
-      releaseBranch,
-      latestTagCommitHash,
-      masterBranch,
-    );
+    const note = await generateReleaseNote(masterBranch, latestTagCommitHash);
 
     loading.success();
     return note;
