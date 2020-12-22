@@ -138,6 +138,15 @@ export default {
     };
   },
 
+  /*
+https://docs.github.com/en/free-pro-team@latest/rest/reference/pulls#get-a-pull-request
+*/
+  getPullRequest: async (number: number) => {
+    const { data } = await git.getPullRequest(number);
+
+    return data;
+  },
+
   getPullRequestList: async (baseBranch: string) => {
     const { data } = await git.listPullRequests(baseBranch);
 

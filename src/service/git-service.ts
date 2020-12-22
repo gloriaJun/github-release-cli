@@ -114,6 +114,13 @@ export default {
       merge_method: 'merge',
     });
   },
+  getPullRequest: (number: number) => {
+    return octokit.pulls.get({
+      owner: repo.owner,
+      repo: repo.name,
+      pull_number: number,
+    });
+  },
   listPullRequests: (baseBranch: string) => {
     return octokit.pulls.list({
       owner: repo.owner,
