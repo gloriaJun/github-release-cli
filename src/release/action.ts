@@ -56,6 +56,12 @@ const generateReleaseNote = async (
   const changelogs: string[] = ['#### Changelogs'];
 
   list.map(({ title, sha, prNumber, milestoneHtmlUrl }) => {
+    const mergeRegExp = new RegExp('^Merge pull request\\s');
+
+    if (mergeRegExp.test(title)) {
+      return;
+    }
+
     changelogs.push(
       `* ${title} ` +
         (prNumber ? `(#${prNumber}) ` : ``) +
