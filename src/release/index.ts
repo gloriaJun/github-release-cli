@@ -1,12 +1,17 @@
 import { pullRequestAction } from 'src/pr';
-import { inquirerContinueProcess, isNotEmpty, logging } from 'src/utility';
+import {
+  getToday,
+  inquirerContinueProcess,
+  isEmpty,
+  isNotEmpty,
+  logging,
+} from 'src/utility';
 import { IReleaseConfig, IReleaseType } from 'src/types';
 
 import {
   createReleaseAction,
   getTagAction,
   generateChagneLogAction,
-  updatePackageVersionAction,
 } from './action';
 
 const confirmCreateTag = async (lastestTag: string, newTag: string) => {
@@ -44,18 +49,24 @@ export const runReleaseProcess = async (
     // crate tag and release note
     logging.stepTitle(`Start create tag and release note from`, releaseBranch);
 
+    const title = releaseConfig.release.title[releaseType]
+      ?.replace('%tag_name%', newTag)
+      .replace('%today%', getToday());
+    const releaseName = isEmpty(title) ? `${newTag} (${getToday()})` : title;
     const note = await generateChagneLogAction(
       releaseBranch,
       prevTagSha,
       basicBranches.master,
     );
-    logging.preview({ text: note });
+    logging.preview({
+      title: releaseName,
+      text: note,
+    });
 
     await inquirerContinueProcess();
     logging.newLine();
 
-    const verionUpdateSha = await updatePackageVersionAction(newTag);
-    await createReleaseAction(newTag, verionUpdateSha, note);
+    await createReleaseAction(newTag, releaseName, note);
 
     logging.newLine();
     logging.success(

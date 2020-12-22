@@ -2,7 +2,7 @@ import * as jsYaml from 'js-yaml';
 import fs from 'fs';
 
 import { isEmpty } from 'src/utility';
-import { gitFlowBranchDefaultModel, IReleaseConfig } from 'src/types';
+import { defaultBranchTypeModel, IReleaseConfig } from 'src/types';
 
 import { getBaseApiUrl, getRepoName, getRepoOwner, getToken } from './auth';
 
@@ -32,7 +32,7 @@ export const loadReleaseConfig = async (path: string) => {
     config.repo.name = await getRepoName();
   }
 
-  config.branch = Object.assign(gitFlowBranchDefaultModel, config.branch);
+  config.branch = Object.assign(defaultBranchTypeModel, config.branch);
 
   return config;
 };
@@ -57,7 +57,7 @@ export default {
       config.repo.name = await getRepoName();
     }
 
-    config.branch = Object.assign(gitFlowBranchDefaultModel, config.branch);
+    config.branch = Object.assign(defaultBranchTypeModel, config.branch);
   },
 
   get: () => {

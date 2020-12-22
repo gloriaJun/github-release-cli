@@ -1,24 +1,8 @@
+import { components } from '@octokit/openapi-types';
+
 export interface IGitRepository {
   owner: string;
   name: string;
-}
-
-export interface IGitFlowBranch {
-  master: 'master' | 'main';
-  develop: 'develop';
-  release: 'release/' | string;
-  hotfix: 'hotfix/' | string;
-}
-
-export const gitFlowBranchDefaultModel: IGitFlowBranch = {
-  master: 'main',
-  develop: 'develop',
-  release: 'release/',
-  hotfix: 'hotfix/',
-} as const;
-
-export interface IGitTag {
-  prefix?: string;
 }
 
 export interface IGitPullRequest {
@@ -27,3 +11,12 @@ export interface IGitPullRequest {
   prNumber?: number;
   milestoneHtmlUrl?: string; // html url about milestone
 }
+
+export interface IGitCreateRelease {
+  tagName: string;
+  releaseName: string;
+  target: string;
+  body?: string;
+}
+
+export type GetRepoContentResponseDataFile = components['schemas']['content-file'];
