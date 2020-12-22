@@ -54,9 +54,8 @@ export const runReleaseProcess = async (
       .replace('%today%', getToday());
     const releaseName = isEmpty(title) ? `${newTag} (${getToday()})` : title;
     const note = await generateChagneLogAction(
-      releaseBranch,
-      prevTagSha,
       basicBranches.master,
+      prevTagSha,
     );
     logging.preview({
       title: releaseName,
