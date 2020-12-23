@@ -12,6 +12,28 @@ import git from './git-service';
 
 let gitFlowBranch: IBranchType;
 
+const getPullRequest = async (number?: number) => {
+  if (!number) {
+    return {};
+  }
+
+  const {
+    data: { labels, milestone },
+  } = await git.getPullRequest(number);
+
+  const labelList = labels.reduce((result: Array<string>, item) => {
+    if (item && item.name) {
+      result.push(item.name);
+    }
+    return result;
+  }, []);
+
+  return {
+    labels: labelList,
+    milestoneHtmlUrl: milestone?.html_url,
+  };
+};
+
 export default {
   setConfiguration: (releaseConfig: IReleaseConfig) => {
     gitFlowBranch = releaseConfig.branch;
@@ -33,9 +55,17 @@ export default {
     return list;
   },
 
-  getBranchInfo: async (branch: string) => {
-    const { data } = await git.getBranch(branch);
-    return data;
+  getLastBranchCommitSha: async (branch?: string) => {
+    const branchName = branch || gitFlowBranch.master;
+    const {
+      data: { commit },
+    } = await git.getBranch(branchName);
+
+    if (!commit.sha) {
+      throw `Can not get the commit sha from ${branchName} `;
+    }
+
+    return commit.sha;
   },
 
   getLatestTag: async () => {
@@ -53,18 +83,35 @@ export default {
       data: { html_url, commits },
     } = await git.compareCommits(head, base);
 
-    const list = commits.reduce(
-      (result: Array<IGitPullRequest>, { commit, sha }) => {
-        if (sha) {
+    const list = await commits.reduce(
+      // async (result: Array<IGitPullRequest>, { commit, sha }) => {
+      async (promise: Promise<Array<IGitPullRequest>>, { commit, sha }) => {
+        const result = await promise.then();
+
+        const ignoreLogPatternRegExp = new RegExp(
+          '((^Merge pull request)|(update release version))\\s',
+        );
+        const title = commit.message.split(EOL)[0];
+
+        if (sha && !ignoreLogPatternRegExp.test(title)) {
+          const prNumber = Number.parseInt(
+            new RegExp('\\s\\(#(\\d{1,})\\)', 'g').exec(title)?.[1] || '',
+          );
+          console.log('### check -> prNumber', prNumber);
+          const prInfo = await getPullRequest(prNumber);
+          console.log('### check -> prInfo', prInfo);
+
           result.push({
-            // title: commit.message.replace(new RegExp(EOL + EOL, 'g'), EOL),
-            title: commit.message.split(EOL)[0],
+            title,
             sha,
+            prNumber,
+            ...prInfo,
           });
         }
-        return result;
+
+        return Promise.resolve(result);
       },
-      [],
+      Promise.resolve([]),
     );
 
     return {
@@ -136,15 +183,6 @@ export default {
       isMerged,
       html_url,
     };
-  },
-
-  /*
-https://docs.github.com/en/free-pro-team@latest/rest/reference/pulls#get-a-pull-request
-*/
-  getPullRequest: async (number: number) => {
-    const { data } = await git.getPullRequest(number);
-
-    return data;
   },
 
   getPullRequestList: async (baseBranch: string) => {

@@ -29,38 +29,23 @@ const getReleaseTagName = (
   return newTag;
 };
 
-const generateReleaseNote = async (
-  masterBranch: string,
-  latestTagCommitHash: string,
-) => {
+const generateReleaseNote = async (latestTagCommitHash: string) => {
   if (isEmpty(latestTagCommitHash)) {
     return 'Initial Release';
   }
 
-  const emptyMessage = 'Empty Changelog';
-  const { commit } = await api.getBranchInfo(masterBranch);
-
-  if (!commit.sha) {
-    return emptyMessage;
-  }
+  const latestBranchCommitHash = await api.getLastBranchCommitSha();
 
   const { html_url, list } = await api.getCommitList(
-    commit.sha,
+    latestBranchCommitHash,
     latestTagCommitHash,
   );
 
   const milestones: string[] = ['#### Milestone'];
   const changelogs: string[] = ['#### Changelogs'];
 
+  // list.map(({ title, sha, prNumber, labels, milestoneHtmlUrl }) => {
   list.map(({ title, sha, prNumber, milestoneHtmlUrl }) => {
-    const ignoreLogPatternRegExp = new RegExp(
-      '((^Merge pull request)|(update release version))\\s',
-    );
-
-    if (ignoreLogPatternRegExp.test(title)) {
-      return;
-    }
-
     changelogs.push(
       `* ${title} ` +
         (prNumber ? `(#${prNumber}) ` : ``) +
@@ -76,7 +61,7 @@ const generateReleaseNote = async (
     arr.length > 1 ? `${arr.join(EOL)}${EOL}${EOL}` : '';
 
   return list.length === 0
-    ? emptyMessage
+    ? 'Empty Changelog'
     : releaseContentArraryToText(changelogs) +
         releaseContentArraryToText(milestones) +
         html_url;
@@ -129,7 +114,7 @@ export const generateChagneLogAction = async (
   try {
     loading.start(`generate the release note content`);
 
-    const note = await generateReleaseNote(masterBranch, latestTagCommitHash);
+    const note = await generateReleaseNote(latestTagCommitHash);
 
     loading.success();
     return note;
