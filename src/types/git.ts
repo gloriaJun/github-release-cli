@@ -9,6 +9,7 @@ export interface IGitPullRequest {
   title: string;
   sha: string;
   prNumber?: number;
+  labels?: string[];
   milestoneHtmlUrl?: string; // html url about milestone
 }
 

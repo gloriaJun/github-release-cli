@@ -29,39 +29,23 @@ const getReleaseTagName = (
   return newTag;
 };
 
-const generateReleaseNote = async (
-  branch: string,
-  latestTagCommitHash: string,
-  masterBranch: string,
-) => {
+const generateReleaseNote = async (latestTagCommitHash: string) => {
   if (isEmpty(latestTagCommitHash)) {
     return 'Initial Release';
   }
 
-  const emptyMessage = 'Empty Changelog';
-  const { commit } = await api.getBranchInfo(masterBranch);
+  const latestBranchCommitHash = await api.getLastBranchCommitSha();
 
-  if (!commit.sha) {
-    return emptyMessage;
-  }
-
-  const { html_url, list: commitList } = await api.getCommitList(
-    commit.sha,
+  const { html_url, list } = await api.getCommitList(
+    latestBranchCommitHash,
     latestTagCommitHash,
   );
-  const list =
-    branch !== masterBranch ? await api.getPullRequestList(branch) : commitList;
 
   const milestones: string[] = ['#### Milestone'];
   const changelogs: string[] = ['#### Changelogs'];
 
+  // list.map(({ title, sha, prNumber, labels, milestoneHtmlUrl }) => {
   list.map(({ title, sha, prNumber, milestoneHtmlUrl }) => {
-    const mergeRegExp = new RegExp('^Merge pull request\\s');
-
-    if (mergeRegExp.test(title)) {
-      return;
-    }
-
     changelogs.push(
       `* ${title} ` +
         (prNumber ? `(#${prNumber}) ` : ``) +
@@ -77,7 +61,7 @@ const generateReleaseNote = async (
     arr.length > 1 ? `${arr.join(EOL)}${EOL}${EOL}` : '';
 
   return list.length === 0
-    ? emptyMessage
+    ? 'Empty Changelog'
     : releaseContentArraryToText(changelogs) +
         releaseContentArraryToText(milestones) +
         html_url;
@@ -124,18 +108,13 @@ export const getTagAction = async (
 };
 
 export const generateChagneLogAction = async (
-  releaseBranch: string,
-  latestTagCommitHash: string,
   masterBranch: string,
+  latestTagCommitHash: string,
 ) => {
   try {
     loading.start(`generate the release note content`);
 
-    const note = await generateReleaseNote(
-      releaseBranch,
-      latestTagCommitHash,
-      masterBranch,
-    );
+    const note = await generateReleaseNote(latestTagCommitHash);
 
     loading.success();
     return note;

@@ -27,7 +27,9 @@ lib/
 .env.production.local
 
 # config
-.config/release.yml
+.config/
+!.config/release-template.yml
+
 
 # log
 *.log*
