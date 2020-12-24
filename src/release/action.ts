@@ -4,7 +4,7 @@ import { RequestError } from '@octokit/types';
 
 import { api } from 'src/service';
 import { isEmpty, loading, logging } from 'src/utility';
-import { ITag, IReleaseType } from 'src/types';
+import { ITag, IReleaseType, IGitPullRequest } from 'src/types';
 
 const parseErrormsg = (error: RequestError) => {
   if (error instanceof Error) {
@@ -29,42 +29,64 @@ const getReleaseTagName = (
   return newTag;
 };
 
-const generateReleaseNote = async (latestTagCommitHash: string) => {
-  if (isEmpty(latestTagCommitHash)) {
-    return 'Initial Release';
-  }
+const generateReleaseNote = (
+  logs: IGitPullRequest[],
+  category: string[] = [],
+  compareUrl: string,
+) => {
+  const EtcCategoryTitle = 'Etc';
+  const milestones = [] as string[];
+  const changelogs = new Map<string, string[]>();
 
-  const latestBranchCommitHash = await api.getLastBranchCommitSha();
+  logs.map(({ title, sha, labels = [], milestoneHtmlUrl }) => {
+    const label: string =
+      labels.filter((v) => category.includes(v))?.[0] || EtcCategoryTitle;
+    const log = `* ${title} ` + `${sha ? sha.substr(0, 7) : ''}`;
 
-  const { html_url, list } = await api.getCommitList(
-    latestBranchCommitHash,
-    latestTagCommitHash,
-  );
-
-  const milestones: string[] = ['#### Milestone'];
-  const changelogs: string[] = ['#### Changelogs'];
-
-  // list.map(({ title, sha, prNumber, labels, milestoneHtmlUrl }) => {
-  list.map(({ title, sha, prNumber, milestoneHtmlUrl }) => {
-    changelogs.push(
-      `* ${title} ` +
-        (prNumber ? `(#${prNumber}) ` : ``) +
-        `${sha ? sha.substr(0, 7) : ''}`,
-    );
+    if (changelogs.has(label)) {
+      const item = changelogs.get(label) || [];
+      item.push(log);
+    } else {
+      changelogs.set(label, [log]);
+    }
 
     if (milestoneHtmlUrl && !milestones.includes(milestoneHtmlUrl)) {
       milestones.push(milestoneHtmlUrl);
     }
   });
 
-  const releaseContentArraryToText = (arr: string[]) =>
-    arr.length > 1 ? `${arr.join(EOL)}${EOL}${EOL}` : '';
+  const releaseContentArraryToText = (title: string, contents: string[]) => {
+    return contents.length > 0
+      ? `${title}${EOL}${EOL}` + `${contents.join(EOL)}${EOL}${EOL}${EOL}`
+      : '';
+  };
 
-  return list.length === 0
-    ? 'Empty Changelog'
-    : releaseContentArraryToText(changelogs) +
-        releaseContentArraryToText(milestones) +
-        html_url;
+  const len = category.length;
+  const note =
+    len > 0
+      ? [...category, EtcCategoryTitle].reduce(
+          (result: string[], item, idx) => {
+            const contents = changelogs.get(item);
+
+            if (!contents) {
+              return result;
+            }
+
+            if (idx < len) {
+              contents.push('');
+            }
+
+            return [...result, `##### ${item}`, ...contents];
+          },
+          [],
+        )
+      : changelogs.get(EtcCategoryTitle) || [];
+
+  return (
+    releaseContentArraryToText('#### Changelog', note) +
+    releaseContentArraryToText('#### Milestone', milestones) +
+    compareUrl
+  );
 };
 
 const updatePackageVersionAction = async (tagName: string) => {
@@ -108,13 +130,29 @@ export const getTagAction = async (
 };
 
 export const generateChagneLogAction = async (
-  masterBranch: string,
   latestTagCommitHash: string,
+  category?: string[],
 ) => {
   try {
     loading.start(`generate the release note content`);
 
-    const note = await generateReleaseNote(latestTagCommitHash);
+    if (isEmpty(latestTagCommitHash)) {
+      loading.success();
+      return 'Initial Release';
+    }
+
+    const latestBranchCommitHash = await api.getLastBranchCommitSha();
+    const { html_url, list } = await api.getCommitList(
+      latestBranchCommitHash,
+      latestTagCommitHash,
+    );
+
+    if (list.length === 0) {
+      loading.success();
+      return 'Empty Changelog';
+    }
+
+    const note = generateReleaseNote(list, category, html_url);
 
     loading.success();
     return note;
