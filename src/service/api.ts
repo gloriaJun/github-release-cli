@@ -84,12 +84,11 @@ export default {
     } = await git.compareCommits(head, base);
 
     const list = await commits.reduce(
-      // async (result: Array<IGitPullRequest>, { commit, sha }) => {
       async (promise: Promise<Array<IGitPullRequest>>, { commit, sha }) => {
         const result = await promise.then();
 
         const ignoreLogPatternRegExp = new RegExp(
-          '((^Merge pull request)|(update release version))\\s',
+          '((^Merge branch)|(^Merge pull request)|(update release version))\\s',
         );
         const title = commit.message.split(EOL)[0];
 
@@ -97,9 +96,7 @@ export default {
           const prNumber = Number.parseInt(
             new RegExp('\\s\\(#(\\d{1,})\\)', 'g').exec(title)?.[1] || '',
           );
-          console.log('### check -> prNumber', prNumber);
           const prInfo = await getPullRequest(prNumber);
-          console.log('### check -> prInfo', prInfo);
 
           result.push({
             title,
