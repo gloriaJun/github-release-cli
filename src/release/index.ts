@@ -32,7 +32,7 @@ export const runReleaseProcess = async (
   releaseConfig: IReleaseConfig,
 ) => {
   try {
-    const basicBranches = releaseConfig.branch;
+    const { branch: basicBranches, release } = releaseConfig;
 
     const { prevTag, newTag, prevTagSha } = await getTagAction(
       releaseType,
@@ -49,14 +49,11 @@ export const runReleaseProcess = async (
     // crate tag and release note
     logging.stepTitle(`Start create tag and release note from`, releaseBranch);
 
-    const title = releaseConfig.release.title[releaseType]
+    const title = release.title[releaseType]
       ?.replace('%tag_name%', newTag)
       .replace('%today%', getToday());
     const releaseName = isEmpty(title) ? `${newTag} (${getToday()})` : title;
-    const note = await generateChagneLogAction(
-      basicBranches.master,
-      prevTagSha,
-    );
+    const note = await generateChagneLogAction(prevTagSha, release.labels);
     logging.preview({
       title: releaseName,
       text: note,
