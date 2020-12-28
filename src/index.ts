@@ -1,4 +1,4 @@
-import commander from 'commander';
+import commander, { Command } from 'commander';
 import { exit } from 'process';
 
 import { loadReleaseConfig } from 'src/config';
@@ -8,6 +8,8 @@ import { api } from 'src/service';
 import { releaseTypes } from 'src/types';
 
 import pkg from '../package.json';
+
+import { runPullRequestProcess } from './pr';
 
 const defaultConfigPath = '.config/release.yml';
 
@@ -30,13 +32,21 @@ export function run() {
     .description('excute the release process', {
       type: releaseTypes.join(' | '),
     })
-    .action(async (type) => {
+    .option('--pr', `whether create Pull Request`)
+    .action(async (type, options: Command) => {
       if (!releaseTypes.includes(type)) {
         logging.error(`Invalid release type: `, type);
         exit(1);
       }
 
+      console.log('## => is pr', options.pr);
+
       const config = await initConfiguration();
+
+      if (options.pr) {
+        await runPullRequestProcess(config.branch);
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       await runReleaseProcess(type, config);
     });
