@@ -9,7 +9,7 @@ cache:
 
 branches:
   only:
-    - master
+    - main
 
 install:
   - npm install
