@@ -1,20 +1,47 @@
 import { EOL } from 'os';
 
-import { fromBase64, getToday, toBase64 } from '../utility';
-import git from './git-service';
-import { IGitFlowBranch, IGitPullRequest, IGitRepository } from './types';
+import { fromBase64, toBase64 } from 'src/utility';
+import {
+  IBranchType,
+  IGitCreateRelease,
+  IGitPullRequest,
+  IReleaseConfig,
+} from 'src/types';
 
-let gitFlowBranch: IGitFlowBranch;
+import git from './git-service';
+
+let gitFlowBranch: IBranchType;
+
+const getPullRequest = async (number?: number) => {
+  if (!number) {
+    return {};
+  }
+
+  const {
+    data: { labels, milestone },
+  } = await git.getPullRequest(number);
+
+  const labelList = labels.reduce((result: Array<string>, item) => {
+    if (item && item.name) {
+      result.push(item.name);
+    }
+    return result;
+  }, []);
+
+  return {
+    labels: labelList,
+    milestoneHtmlUrl: milestone?.html_url,
+  };
+};
 
 export default {
-  setConfiguration: (
-    baseUrl: string,
-    token: string,
-    options: IGitRepository,
-    branches: IGitFlowBranch,
-  ) => {
-    gitFlowBranch = branches;
-    git.configure(baseUrl, token, options);
+  setConfiguration: (releaseConfig: IReleaseConfig) => {
+    gitFlowBranch = releaseConfig.branch;
+    git.configure(
+      releaseConfig.baseUrl,
+      releaseConfig.token,
+      releaseConfig.repo,
+    );
   },
 
   getBranchList: async () => {
@@ -28,9 +55,17 @@ export default {
     return list;
   },
 
-  getBranchInfo: async (branch: string) => {
-    const { data } = await git.getBranch(branch);
-    return data;
+  getLastBranchCommitSha: async (branch?: string) => {
+    const branchName = branch || gitFlowBranch.master;
+    const {
+      data: { commit },
+    } = await git.getBranch(branchName);
+
+    if (!commit.sha) {
+      throw `Can not get the commit sha from ${branchName} `;
+    }
+
+    return commit.sha;
   },
 
   getLatestTag: async () => {
@@ -48,16 +83,32 @@ export default {
       data: { html_url, commits },
     } = await git.compareCommits(head, base);
 
-    const list = commits.reduce(
-      (result: Array<IGitPullRequest>, { commit, sha }) => {
-        result.push({
-          // title: commit.message.replace(new RegExp(EOL + EOL, 'g'), EOL),
-          title: commit.message.split(EOL)[0],
-          sha,
-        });
-        return result;
+    const list = await commits.reduce(
+      async (promise: Promise<Array<IGitPullRequest>>, { commit, sha }) => {
+        const result = await promise.then();
+
+        const ignoreLogPatternRegExp = new RegExp(
+          '((^Merge branch)|(^Merge pull request)|(update release version))\\s',
+        );
+        const title = commit.message.split(EOL)[0];
+
+        if (sha && !ignoreLogPatternRegExp.test(title)) {
+          const prNumber = Number.parseInt(
+            new RegExp('\\s\\(#(\\d{1,})\\)', 'g').exec(title)?.[1] || '',
+          );
+          const prInfo = await getPullRequest(prNumber);
+
+          result.push({
+            title,
+            sha,
+            prNumber,
+            ...prInfo,
+          });
+        }
+
+        return Promise.resolve(result);
       },
-      [],
+      Promise.resolve([]),
     );
 
     return {
@@ -73,9 +124,10 @@ export default {
       return matched ? matched[0] : '';
     };
 
-    const {
-      data: { sha, content },
-    } = await git.getContent(path, gitFlowBranch.master);
+    const { sha, content } = await git.getFileContent(
+      path,
+      gitFlowBranch.master,
+    );
 
     const regexp = new RegExp('("version":\\s+)"((\\d\\.){2}\\d)"');
     const newScript = fromBase64(content).replace(
@@ -95,14 +147,8 @@ export default {
     return commit;
   },
 
-  createRelease: async (tagName: string, target: string, body?: string) => {
-    const { data } = await git.createRelease(
-      tagName,
-      `${tagName} (${getToday()})`,
-      target,
-      body,
-    );
-
+  createRelease: async (param: IGitCreateRelease) => {
+    const { data } = await git.createRelease(param);
     return data.html_url;
   },
 
@@ -144,12 +190,14 @@ export default {
         result: Array<IGitPullRequest>,
         { title, number, merge_commit_sha, milestone },
       ) => {
-        result.push({
-          title,
-          prNumber: number,
-          sha: merge_commit_sha,
-          milestoneHtmlUrl: milestone?.html_url,
-        });
+        if (merge_commit_sha) {
+          result.push({
+            title,
+            prNumber: number,
+            sha: merge_commit_sha,
+            milestoneHtmlUrl: milestone?.html_url,
+          });
+        }
         return result;
       },
       [],

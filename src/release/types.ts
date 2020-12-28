@@ -1,8 +1,9 @@
 import semver from 'semver';
-import { IGitFlowBranchInfo } from '../interface';
+
+import { IGitFlowBranch } from 'src/service';
 
 export interface IReleaseProcessConfig {
   releaseType: semver.ReleaseType;
-  basicBranches: IGitFlowBranchInfo;
+  basicBranches: IGitFlowBranch;
   tagPrefix: string;
 }

@@ -1,11 +1,16 @@
-import { pullRequestAction } from '../action';
-import { inquirerContinueProcess, isNotEmpty, logging } from '../utility';
-import { IReleaseProcessConfig } from './types';
+import {
+  getToday,
+  inquirerContinueProcess,
+  isEmpty,
+  isNotEmpty,
+  logging,
+} from 'src/utility';
+import { IReleaseConfig, IReleaseType } from 'src/types';
+
 import {
   createReleaseAction,
   getTagAction,
   generateChagneLogAction,
-  updatePackageVersionAction,
 } from './action';
 
 const confirmCreateTag = async (lastestTag: string, newTag: string) => {
@@ -21,41 +26,47 @@ const confirmCreateTag = async (lastestTag: string, newTag: string) => {
   );
 };
 
-export const runReleaseProcess = async (config: IReleaseProcessConfig) => {
+export const runReleaseProcess = async (
+  releaseType: IReleaseType,
+  releaseConfig: IReleaseConfig,
+) => {
   try {
-    const { basicBranches } = config;
+    const {
+      branch: { master: releaseBranch },
+      release,
+    } = releaseConfig;
 
-    const { prevTag, newTag, prevTagSha } = await getTagAction(config);
+    const { prevTag, newTag, prevTagSha } = await getTagAction(
+      releaseType,
+      releaseConfig.tag,
+    );
     await confirmCreateTag(prevTag, newTag);
-
-    const releaseBranch =
-      (await pullRequestAction(
-        [basicBranches.release, basicBranches.hotfix],
-        basicBranches,
-      )) || basicBranches.master;
 
     // crate tag and release note
     logging.stepTitle(`Start create tag and release note from`, releaseBranch);
 
-    const note = await generateChagneLogAction(
-      releaseBranch,
-      prevTagSha,
-      config,
-    );
-    logging.preview({ text: note });
+    const title = release.title[releaseType]
+      ?.replace('%tag_name%', newTag)
+      .replace('%today%', getToday());
+    const releaseName = isEmpty(title) ? `${newTag} (${getToday()})` : title;
+    const note = await generateChagneLogAction(prevTagSha, release.labels);
+    logging.preview({
+      title: releaseName,
+      text: note,
+    });
 
     await inquirerContinueProcess();
     logging.newLine();
 
-    const verionUpdateSha = await updatePackageVersionAction(newTag);
-    await createReleaseAction(newTag, verionUpdateSha, note);
+    await createReleaseAction(newTag, releaseName, note);
 
     logging.newLine();
     logging.success(
       `🎉🎉🎉 Success release ${newTag} from ${releaseBranch} 🎉🎉🎉`,
     );
     logging.newLine();
-  } catch (e) {
-    logging.error(e);
+  } catch (error) {
+    logging.newLine();
+    logging.error(error);
   }
 };

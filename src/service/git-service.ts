@@ -1,6 +1,10 @@
 import { Octokit } from '@octokit/rest';
 
-import { IGitRepository } from './types';
+import {
+  IGitRepository,
+  GetRepoContentResponseDataFile,
+  IGitCreateRelease,
+} from 'src/types';
 
 let octokit: Octokit;
 let repo: IGitRepository;
@@ -27,13 +31,19 @@ export default {
       branch,
     });
   },
-  getContent: (path: string, ref?: string) => {
-    return octokit.repos.getContent({
+  getFileContent: async (path: string, ref?: string) => {
+    const { data } = await octokit.repos.getContent({
       owner: repo.owner,
       repo: repo.name,
       path,
       ref,
     });
+
+    if (!data || Array.isArray(data)) {
+      throw 'path is not file type';
+    }
+
+    return data as GetRepoContentResponseDataFile;
   },
   createOrUpdateFileContents: (
     path: string,
@@ -64,12 +74,12 @@ export default {
       repo: repo.name,
     });
   },
-  createRelease: (
-    tagName: string,
-    releaseName: string,
-    target: string,
-    body?: string,
-  ) => {
+  createRelease: ({
+    tagName,
+    releaseName,
+    target,
+    body,
+  }: IGitCreateRelease) => {
     return octokit.repos.createRelease({
       owner: repo.owner,
       repo: repo.name,
@@ -102,6 +112,13 @@ export default {
       repo: repo.name,
       pull_number: number,
       merge_method: 'merge',
+    });
+  },
+  getPullRequest: (number: number) => {
+    return octokit.pulls.get({
+      owner: repo.owner,
+      repo: repo.name,
+      pull_number: number,
     });
   },
   listPullRequests: (baseBranch: string) => {

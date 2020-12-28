@@ -5,9 +5,7 @@
   "repository": "https://github.com/gloriaJun/github-release-cli.git",
   "author": "gloriaJun <pureainu@gmail.com>",
   "license": "(MIT OR Apache-2.0)",
-  "bin": {
-    "grmc": "./bin/grmc"
-  },
+  "bin": "./bin/grmc",
   "files": [
     "lib",
     "bin"
@@ -22,29 +20,38 @@
   ],
   "scripts": {
     "prebuild": "rimraf lib",
-    "build": "tsc",
+    "build": "parcel build src/index.ts -d lib --target node --bundle-node-modules --no-source-maps",
     "prestart": "yarn build",
     "start": "node ./bin/grmc",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --fix --ext .js,.jsx,.ts,.tsx"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/preset-typescript": "^7.12.7",
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
+    "@octokit/openapi-types": "^2.0.1",
+    "@octokit/types": "^6.1.1",
     "@types/commander": "^2.12.2",
     "@types/dotenv": "^8.2.0",
     "@types/inquirer": "^7.3.1",
+    "@types/js-yaml": "^3.12.5",
     "@types/node": "^14.14.7",
     "@types/ora": "^3.2.0",
     "@types/semver": "^7.3.4",
     "@typescript-eslint/eslint-plugin": "^4.7.0",
-    "@typescript-eslint/parser": "^4.7.0",
+    "@typescript-eslint/parser": "^4.9.1",
+    "babel-plugin-module-resolver": "^4.0.0",
     "eslint": "^7.13.0",
     "eslint-config-prettier": "^6.15.0",
+    "eslint-import-resolver-babel-module": "^5.2.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.3.0",
     "lint-staged": "^10.5.1",
+    "parcel-bundler": "^1.12.4",
     "prettier": "^2.1.2",
     "rimraf": "^3.0.2",
     "typescript": "^4.0.5"
@@ -55,8 +62,15 @@
     "commander": "^6.2.0",
     "dotenv": "^8.2.0",
     "inquirer": "^7.3.3",
+    "js-yaml": "^3.14.1",
     "ora": "^5.1.0",
     "pad": "^3.2.0",
     "semver": "^7.3.2"
+  },
+  "alias": {
+    "src": "./src/"
+  },
+  "engines": {
+    "node": ">=12.13.0"
   }
 }

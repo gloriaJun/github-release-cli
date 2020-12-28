@@ -2,8 +2,14 @@
 
 # dependencies
 node_modules/
+.cache/
 .pnp
 .pnp.js
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
 
 # testing
 coverage/
@@ -20,6 +26,11 @@ lib/
 .env.test.local
 .env.production.local
 
+# config
+.config/
+!.config/release-template.yml
+
+
 # log
 *.log*
 npm-debug.log*
@@ -28,10 +39,9 @@ yarn-error.log*
 *.out
 
 # lock
-*.lock
 *lock.json
 
 # ide
 .idea
 *.iml
-.vscode
+#.vscode

@@ -2,12 +2,13 @@ import { EOL } from 'os';
 import pad from 'pad';
 import chalk from 'chalk';
 
-import { isEmpty } from './object';
 import { IGeneralObject } from '../interface';
+
+import { isEmpty } from './object';
 
 const paddingSize = 20;
 
-const log = (...args: any[]) => {
+const log = (...args: unknown[]) => {
   console.log(...args);
 };
 
@@ -25,7 +26,7 @@ export default {
   success: (message: string) => {
     log(chalk.green(`✔`), message);
   },
-  error: (...args: any[]) => {
+  error: (...args: unknown[]) => {
     console.error(chalk.bgBlack.red('ERROR!!!'), ...args);
     newLine();
   },
@@ -33,7 +34,6 @@ export default {
 
   // about the processing step
   stepTitle: (title: string, info?: string) => {
-    newLine();
     log(`🚀 ${title}`, info ? chalk.bold(info) : '');
   },
   preview: ({ title, text }: IGeneralObject<string>) => {

@@ -2,6 +2,7 @@
 
 > git release management command-line tool
 
+[![npm version](https://badge.fury.io/js/grmc.svg)](https://badge.fury.io/js/grmc)
 [![Build Status](https://travis-ci.com/gloriaJun/github-release-cli.svg?branch=main)](https://travis-ci.com/gloriaJun/github-release-cli)
 
 ## Functions
@@ -25,19 +26,27 @@ npm install --save-dev grmc
 
 > git token needs the read and write auth
 
-### Create the .env.local
+### Create the `.config/release.yml`
 
 ```bash
-BASE_URL=https://api.github.com
-TOKEN=
-REPO_OWNER=
-REPO_NAME=
+baseUrl: https://api.github.com
+token:
 
-# branch info
-#MASTER=main
-#DEVELOP=develop
-#RELEASE=release
-#HOTFIX=hotfix
+repo: { owner: repo_owner, name: repo_name }
+
+branch: { master: master, develop: develop, release: release, hotfix: hotfix }
+
+tag: { prefix: v }
+
+release:
+  {
+    title:
+      {
+        major: major/%tag_name%,
+        minor: minor/%tag_name%,
+        patch: patch/%tag_name%,
+      },
+  }
 ```
 
 ## Usage
@@ -45,7 +54,7 @@ REPO_NAME=
 ### Run Cli
 
 ```bash
-$ grmc rel major -c .env.local
+$ grmc rel major -c .config/release-local.yml
 🚀 Start create pr & merge process
 ? Do you want to create pr? (Y/n) Y
 ? Choose the target branch release/1.0.0
@@ -70,7 +79,7 @@ Target Branch List
 #### Run Only Create Release Note
 
 ```bash
-$ grmc rel major -c .env.local
+$ grmc rel major -c .config/release-local.yml
 🚀 Start create pr & merge process
 ? Do you want to create pr? No
 
