@@ -1,4 +1,3 @@
-import { pullRequestAction } from 'src/pr';
 import {
   getToday,
   inquirerContinueProcess,
@@ -32,19 +31,16 @@ export const runReleaseProcess = async (
   releaseConfig: IReleaseConfig,
 ) => {
   try {
-    const { branch: basicBranches, release } = releaseConfig;
+    const {
+      branch: { master: releaseBranch },
+      release,
+    } = releaseConfig;
 
     const { prevTag, newTag, prevTagSha } = await getTagAction(
       releaseType,
       releaseConfig.tag,
     );
     await confirmCreateTag(prevTag, newTag);
-
-    const releaseBranch =
-      (await pullRequestAction(
-        [basicBranches.release, basicBranches.hotfix],
-        basicBranches,
-      )) || basicBranches.master;
 
     // crate tag and release note
     logging.stepTitle(`Start create tag and release note from`, releaseBranch);

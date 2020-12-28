@@ -1,22 +1,14 @@
 import { api } from 'src/service';
-import { inquirerConfirmQuestion, loading, logging } from 'src/utility';
-import { IGitFlowBranch } from 'src/types';
+import { loading, logging } from 'src/utility';
+import { IBranchType } from 'src/types';
 
 import { askPullRequestProcess } from './inquirer';
 
-export const pullRequestAction = async (
+const pullRequestAction = async (
   prefixLsit: string[],
-  gitFlowBranchInfo: IGitFlowBranch,
+  gitFlowBranchInfo: IBranchType,
 ) => {
   logging.stepTitle(`Start create pr & merge process`);
-
-  const answer = await inquirerConfirmQuestion({
-    message: 'Do you want to create pr?',
-    default: true,
-  });
-  if (!answer) {
-    return;
-  }
 
   const { relBranch, targetPrBranchInfo } = await askPullRequestProcess(
     prefixLsit,
@@ -51,5 +43,17 @@ export const pullRequestAction = async (
     return relBranch;
   } finally {
     loading.stop();
+  }
+};
+
+export const runPullRequestProcess = async (basicBranches: IBranchType) => {
+  try {
+    await pullRequestAction(
+      [basicBranches.release, basicBranches.hotfix],
+      basicBranches,
+    );
+  } catch (error) {
+    logging.newLine();
+    logging.error(error);
   }
 };
