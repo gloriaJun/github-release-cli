@@ -15,5 +15,5 @@ release:
         minor: minor/%tag_name% (%today%),
         patch: patch/%tag_name% (%today%),
       },
-    labels: [],
+    labels: ['enhancement', 'documentation', 'bug'],
   }

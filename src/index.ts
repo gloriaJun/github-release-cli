@@ -39,8 +39,6 @@ export function run() {
         exit(1);
       }
 
-      console.log('## => is pr', options.pr);
-
       const config = await initConfiguration();
 
       if (options.pr) {
