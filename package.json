@@ -13,6 +13,9 @@
   "bugs": {
     "url": "https://github.com/gloriaJun/github-release-cli/issues"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "keywords": [
     "git",
     "releaes",
